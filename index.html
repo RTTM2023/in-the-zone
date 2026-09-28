@@ -7,46 +7,50 @@
 <meta name="description" content="A two-minute anonymous team check on safety, influence and accountability.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #EDF0F3;
+  --bg: #F4F6F9;
   --surface: #FFFFFF;
-  --ink: #1B2433;
-  --ink-soft: #4A5568;
-  --line: #CCD3DC;
+  --ink: #141B2B;
+  --ink-soft: #5B6474;
+  --line: #E1E6ED;
+  --line-strong: #C9D1DC;
   --learning: #0E7C6B;
   --comfort: #4F7FAE;
   --anxiety: #C98A0B;
   --apathy: #7F7590;
   --danger: #B42318;
-  --focus: #2563EB;
-  --field-learning: rgba(14,124,107,.13);
-  --field-comfort: rgba(79,127,174,.12);
-  --field-anxiety: rgba(201,138,11,.13);
-  --field-apathy: rgba(127,117,144,.13);
-  --radius-lg: 18px;
-  --radius-sm: 8px;
-  --display: "Bricolage Grotesque", "Segoe UI", sans-serif;
-  --body: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+  --focus: rgba(20,27,43,.18);
+  --field-learning: rgba(14,124,107,.10);
+  --field-comfort: rgba(79,127,174,.09);
+  --field-anxiety: rgba(201,138,11,.10);
+  --field-apathy: rgba(127,117,144,.10);
+  --radius-lg: 16px;
+  --radius-sm: 10px;
+  --display: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --shadow: 0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.03);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #111722;
-    --surface: #1A2231;
-    --ink: #E8ECF2;
-    --ink-soft: #A7B1C0;
-    --line: #2E3A4E;
+    --bg: #0F141D;
+    --surface: #171E2A;
+    --ink: #E9EDF3;
+    --ink-soft: #9AA5B5;
+    --line: #273142;
+    --line-strong: #364257;
     --learning: #3FBFA6;
     --comfort: #7FA9D6;
     --anxiety: #E6B447;
     --apathy: #AFA5C2;
     --danger: #F2837A;
-    --focus: #7AA7FF;
-    --field-learning: rgba(63,191,166,.14);
-    --field-comfort: rgba(127,169,214,.13);
-    --field-anxiety: rgba(230,180,71,.13);
-    --field-apathy: rgba(175,165,194,.13);
+    --focus: rgba(233,237,243,.22);
+    --field-learning: rgba(63,191,166,.12);
+    --field-comfort: rgba(127,169,214,.11);
+    --field-anxiety: rgba(230,180,71,.11);
+    --field-apathy: rgba(175,165,194,.11);
+    --shadow: none;
   }
   .zone-hero { color: #0E1520 !important; }
 }
@@ -57,154 +61,152 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--body);
-  font-size: 17px;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv11", "ss01";
 }
 a { color: inherit; }
 .wrap { max-width: 680px; margin: 0 auto; padding: 0 16px; }
 .brandbar {
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  padding: 18px 0 8px; font-size: 14px; color: var(--ink-soft);
+  padding: 20px 0 8px; font-size: 13px; color: var(--ink-soft);
 }
-.brandbar b { color: var(--ink); font-weight: 700; }
+.brandbar b { color: var(--ink); font-weight: 600; }
 .demo {
-  background: var(--ink); color: var(--bg); font-size: 14px;
-  padding: 10px 16px; border-radius: var(--radius-sm); margin: 8px 0 0;
+  background: var(--ink); color: var(--bg); font-size: 13px;
+  padding: 10px 14px; border-radius: var(--radius-sm); margin: 8px 0 0;
 }
 .demo button { font: inherit; color: inherit; background: none; border: 0; padding: 0 0 1px; margin-right: 12px; text-decoration: underline; cursor: pointer; }
-main { padding: 24px 0 64px; }
-h1, h2, h3 { font-family: var(--display); line-height: 1.12; margin: 0; }
+main { padding: 28px 0 64px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; }
 .wordmark {
-  font-family: var(--display); font-weight: 800; font-size: clamp(52px, 13vw, 92px);
-  letter-spacing: -0.035em; line-height: .92; margin: 8px 0 18px;
+  font-weight: 800; font-size: clamp(48px, 12vw, 84px);
+  letter-spacing: -0.05em; line-height: .95; margin: 8px 0 18px;
 }
-.wordmark .in {
-  display: inline-block; background: var(--learning); color: #fff;
-  padding: 0 .12em; border-radius: .12em; margin-right: .06em;
-}
-h1.page { font-size: clamp(30px, 7vw, 44px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; }
-h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 10px; }
-h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+h1.page { font-size: clamp(28px, 6.5vw, 40px); font-weight: 700; letter-spacing: -0.035em; margin-bottom: 12px; }
+h2 { font-size: 20px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 8px; }
+h3 { font-size: 16px; font-weight: 650; letter-spacing: -0.01em; margin-bottom: 6px; }
 p { margin: 0 0 14px; }
-.lede { font-size: 19px; color: var(--ink-soft); max-width: 34em; }
+.lede { font-size: 18px; color: var(--ink-soft); max-width: 34em; letter-spacing: -0.01em; }
 .muted { color: var(--ink-soft); }
 .small { font-size: 14px; }
-section { margin-top: 36px; }
+section { margin-top: 32px; }
 .panel {
   background: var(--surface); border-radius: var(--radius-lg);
-  padding: 22px 20px; border: 1px solid var(--line);
+  padding: 24px 22px; border: 1px solid var(--line); box-shadow: var(--shadow);
 }
 .panel + .panel { margin-top: 14px; }
 .steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
-.steps li { counter-increment: s; position: relative; padding: 0 0 14px 44px; }
+.steps li { counter-increment: s; position: relative; padding: 0 0 14px 40px; }
 .steps li::before {
-  content: counter(s); position: absolute; left: 0; top: -1px;
-  width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--ink);
-  display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 15px;
+  content: counter(s); position: absolute; left: 0; top: 1px;
+  width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--surface);
+  display: grid; place-items: center; font-weight: 600; font-size: 13px;
 }
-label.field { display: block; font-weight: 700; margin-bottom: 6px; }
-.hint { font-size: 14px; color: var(--ink-soft); margin: -2px 0 8px; }
+label.field, .field { display: block; font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+.hint { font-size: 14px; color: var(--ink-soft); margin: -2px 0 10px; }
 input[type=text], input[type=password] {
   width: 100%; font: inherit; color: var(--ink); background: var(--surface);
-  border: 2px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px;
+  border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 11px 13px;
+  transition: border-color .15s, box-shadow .15s;
 }
-input[type=text]:focus, input[type=password]:focus { border-color: var(--ink); outline: none; }
-:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+input[type=text]:focus, input[type=password]:focus { border-color: var(--ink); box-shadow: 0 0 0 4px var(--focus); outline: none; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.seg { display: inline-flex; background: var(--bg); border-radius: 12px; padding: 4px; gap: 4px; }
 .seg label {
-  flex: 1 1 0; min-width: 76px; text-align: center; cursor: pointer;
-  border: 2px solid var(--line); border-radius: var(--radius-sm); padding: 10px 6px;
-  font-weight: 700; background: var(--surface);
+  min-width: 72px; text-align: center; cursor: pointer;
+  border-radius: 9px; padding: 8px 14px; font-weight: 500; font-size: 15px; color: var(--ink-soft);
+  transition: background .15s, color .15s;
 }
 .seg input { position: absolute; opacity: 0; pointer-events: none; }
-.seg input:checked + span { color: var(--surface); }
-.seg label:has(input:checked) { background: var(--ink); border-color: var(--ink); color: var(--surface); }
-.seg label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
-.slider { margin: 18px 0 6px; }
-.slider .top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
-.slider output { font-family: var(--display); font-weight: 700; font-size: 20px; min-width: 2.2em; text-align: right; }
-.slider .ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); }
-input[type=range] { width: 100%; accent-color: var(--ink); margin: 8px 0 2px; height: 28px; }
-.predict-grid { display: grid; gap: 8px 24px; grid-template-columns: 1fr; }
-@media (min-width: 640px) { .predict-grid { grid-template-columns: 1fr 250px; align-items: center; } }
+.seg label:has(input:checked) { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(16,24,40,.12); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 1px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  font: inherit; font-weight: 700; cursor: pointer; text-decoration: none;
-  border-radius: 999px; padding: 13px 22px; border: 2px solid var(--ink);
-  background: var(--ink); color: var(--surface);
+  font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none;
+  border-radius: 10px; padding: 12px 20px; border: 1px solid var(--ink);
+  background: var(--ink); color: var(--surface); transition: opacity .15s, background .15s;
 }
-.btn.secondary { background: transparent; color: var(--ink); }
-.btn.small { padding: 7px 14px; font-size: 15px; }
+.btn:hover { opacity: .9; }
+.btn.secondary { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
+.btn.secondary:hover { opacity: 1; border-color: var(--ink-soft); }
+.btn.small { padding: 7px 13px; font-size: 14px; border-radius: 8px; }
 .btn[disabled] { opacity: .5; cursor: progress; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
-.linkbox {
-  display: flex; gap: 8px; align-items: stretch; margin: 8px 0;
-}
+.linkbox { display: flex; gap: 8px; align-items: stretch; margin: 8px 0; }
 .linkbox code {
-  flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--body); font-size: 14px;
-  background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px;
+  flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--body); font-size: 13px;
+  background: var(--bg); border-radius: 8px; padding: 9px 12px; color: var(--ink-soft);
 }
 textarea {
-  width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--bg);
+  width: 100%; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg);
   border: 0; border-radius: var(--radius-sm); padding: 12px; min-height: 150px; resize: vertical;
 }
-.warn { border-left: 4px solid var(--anxiety); padding: 4px 0 4px 12px; margin: 12px 0; }
-.error { color: var(--danger); font-weight: 700; margin-top: 12px; }
-.note { background: var(--bg); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 15px; margin: 16px 0; }
+.warn { border-left: 3px solid var(--anxiety); padding: 4px 0 4px 12px; margin: 12px 0; }
+.error { color: var(--danger); font-weight: 600; font-size: 15px; margin-top: 12px; }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px 18px; font-size: 14px; margin: 18px 0; color: var(--ink-soft); }
+.note b { color: var(--ink); font-weight: 600; }
 .q { padding: 20px 0; border-top: 1px solid var(--line); }
-.q:first-of-type { border-top: 0; }
+.q:first-of-type { border-top: 0; padding-top: 4px; }
 .q.missing .qtext { color: var(--danger); }
-.qtext { font-weight: 700; margin-bottom: 12px; display: flex; gap: 10px; }
-.qnum { font-family: var(--display); color: var(--ink-soft); min-width: 1.2em; }
+.qtext { font-weight: 500; font-size: 16px; margin-bottom: 12px; display: flex; gap: 12px; letter-spacing: -0.01em; }
+.qnum { color: var(--ink-soft); min-width: 1.1em; font-weight: 500; font-variant-numeric: tabular-nums; }
 .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .scale label {
-  border: 2px solid var(--line); border-radius: var(--radius-sm); text-align: center;
-  padding: 10px 0; cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 18px;
-  background: var(--surface);
+  border: 1px solid var(--line-strong); border-radius: 10px; text-align: center;
+  padding: 10px 0; cursor: pointer; font-weight: 600; font-size: 15px; color: var(--ink-soft);
+  background: var(--surface); transition: border-color .15s, background .15s, color .15s;
 }
+.scale label:hover { border-color: var(--ink-soft); color: var(--ink); }
 .scale input { position: absolute; opacity: 0; pointer-events: none; }
 .scale label:has(input:checked) { background: var(--ink); border-color: var(--ink); color: var(--surface); }
-.scale label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
-.scale-ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
-.zone-hero { border-radius: var(--radius-lg); padding: 22px 20px; color: #fff; }
-.zone-hero .k { font-size: 15px; opacity: .9; }
-.zone-hero h2 { font-size: clamp(34px, 9vw, 52px); font-weight: 800; letter-spacing: -0.03em; margin: 2px 0 10px; }
-.zone-hero p { margin: 0; max-width: 34em; }
-.chart svg { width: 100%; max-width: 460px; height: auto; display: block; }
-.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
+.scale label:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
+.scale-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+.zone-hero { border-radius: var(--radius-lg); padding: 24px 22px; color: #fff; }
+.zone-hero .k { font-size: 14px; opacity: .9; }
+.zone-hero h2 { font-size: clamp(32px, 8vw, 46px); font-weight: 750; letter-spacing: -0.04em; margin: 2px 0 10px; }
+.zone-hero p { margin: 0; max-width: 34em; font-size: 15px; }
+.chart svg { width: 100%; max-width: 440px; height: auto; display: block; margin: 4px auto 0; }
+.legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
-.gap-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+.gap-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 14px; }
 .gap-table th, .gap-table td { text-align: left; padding: 10px 6px; border-top: 1px solid var(--line); vertical-align: top; }
-.gap-table th { font-weight: 700; }
-.gap-table td.num { font-family: var(--display); font-weight: 700; white-space: nowrap; }
-.bars { margin: 10px 0 0; }
-.bar { margin: 12px 0; }
-.bar .lbl { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
-.bar .lbl b { font-family: var(--display); }
-.bar .track { height: 10px; background: var(--bg); border-radius: 999px; margin-top: 6px; overflow: hidden; }
+.gap-table thead th { color: var(--ink-soft); font-weight: 500; font-size: 13px; border-top: 0; }
+.gap-table th { font-weight: 600; }
+.gap-table td.num { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bars { margin: 6px 0 0; }
+.bar { margin: 14px 0; }
+.bar .lbl { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
+.bar .lbl b { font-weight: 650; font-variant-numeric: tabular-nums; }
+.bar .track { position: relative; height: 8px; background: var(--bg); border-radius: 999px; margin-top: 7px; }
 .bar .fill { height: 100%; border-radius: 999px; background: var(--ink); }
-.group-h { font-family: var(--display); font-weight: 700; font-size: 16px; margin: 22px 0 0; }
-ol.qs { padding-left: 22px; margin: 0; }
-ol.qs li { margin: 8px 0; }
-.progress { height: 12px; background: var(--bg); border-radius: 999px; overflow: hidden; margin: 12px 0; }
+.bar .pm { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; border: 2px solid var(--ink); background: var(--surface); }
+.bar .gapnote { font-size: 12.5px; color: var(--ink-soft); margin-top: 5px; }
+.group-h { font-weight: 650; font-size: 14px; letter-spacing: -0.01em; margin: 24px 0 0; color: var(--ink-soft); }
+.callout { background: var(--bg); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px; margin-top: 12px; }
+ol.qs { padding-left: 20px; margin: 0; }
+ol.qs li { margin: 8px 0; padding-left: 4px; }
+.progress { height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden; margin: 14px 0; }
 .progress div { height: 100%; background: var(--learning); border-radius: 999px; }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.stat { background: var(--bg); border-radius: var(--radius-sm); padding: 12px; }
-.stat b { display: block; font-family: var(--display); font-size: 28px; line-height: 1.1; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px; }
+.stat b { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
 .stat span { font-size: 13px; color: var(--ink-soft); }
 .tablewrap { overflow-x: auto; margin-top: 10px; }
 table.teams { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
-table.teams th, table.teams td { text-align: left; padding: 9px 8px; border-top: 1px solid var(--line); }
-table.teams th { font-weight: 700; }
-.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
-.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; cursor: pointer; }
-.toggle input { width: 18px; height: 18px; accent-color: var(--ink); }
+table.teams th, table.teams td { text-align: left; padding: 10px 8px; border-top: 1px solid var(--line); }
+table.teams thead th { font-weight: 500; color: var(--ink-soft); font-size: 13px; border-top: 0; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.toggle input { width: 16px; height: 16px; accent-color: var(--ink); }
 .center { text-align: center; }
 .spinner { padding: 60px 0; text-align: center; color: var(--ink-soft); }
-footer { padding: 0 0 40px; font-size: 13px; color: var(--ink-soft); }
+footer { padding: 0 0 40px; font-size: 12px; color: var(--ink-soft); }
 @media (prefers-reduced-motion: no-preference) {
-  .reveal { animation: rise .45s ease-out both; }
-  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .reveal { animation: rise .4s ease-out both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 }
 </style>
 </head>
@@ -232,14 +234,14 @@ const CONFIG = {
 /* ====================================================================== */
 
 const QUESTIONS = [
-  { text: "I feel safe to speak up, disagree or admit a mistake in this team.", short: "Safe to speak up", dim: "safety" },
-  { text: "I can be myself here without having to tone down who I am.", short: "Can be myself", dim: "safety" },
-  { text: "I have real influence over decisions that affect my work.", short: "Influence over decisions", dim: "power" },
-  { text: "When I raise an idea or concern, it is taken seriously and acted on.", short: "Ideas taken seriously", dim: "power" },
-  { text: "I know exactly what's expected of me and what good looks like.", short: "Clarity", dim: "accountability" },
-  { text: "When work falls short, it gets noticed and addressed.", short: "Follow-through", dim: "accountability" },
-  { text: "I'm challenged to grow, not just to get through the work.", short: "Stretch", dim: "accountability" },
-  { text: "The same bar applies to everyone in this team.", short: "Fairness", dim: "accountability" }
+  { text: "I feel safe to speak up, disagree or admit a mistake in this team.", lead: "People feel safe to speak up, disagree or admit a mistake in this team.", short: "Safe to speak up", dim: "safety" },
+  { text: "I can be myself here without having to tone down who I am.", lead: "People can be themselves here without having to tone down who they are.", short: "Can be myself", dim: "safety" },
+  { text: "I have real influence over decisions that affect my work.", lead: "People have real influence over decisions that affect their work.", short: "Influence over decisions", dim: "power" },
+  { text: "When I raise an idea or concern, it is taken seriously and acted on.", lead: "When people raise an idea or concern, it is taken seriously and acted on.", short: "Ideas taken seriously", dim: "power" },
+  { text: "I know exactly what's expected of me and what good looks like.", lead: "People know exactly what's expected of them and what good looks like.", short: "Clarity", dim: "accountability" },
+  { text: "When work falls short, it gets noticed and addressed.", lead: "When work falls short, it gets noticed and addressed.", short: "Follow-through", dim: "accountability" },
+  { text: "I'm challenged to grow, not just to get through the work.", lead: "People are challenged to grow, not just to get through the work.", short: "Stretch", dim: "accountability" },
+  { text: "The same bar applies to everyone in this team.", lead: "The same bar applies to everyone in this team.", short: "Fairness", dim: "accountability" }
 ];
 const DIMS = { safety: "Safety", power: "Influence", accountability: "Accountability" };
 
@@ -331,19 +333,29 @@ function summarise(answers) {
   };
 }
 
+function predFromItems(items) {
+  return {
+    items,
+    safety: r2(mean([items[0], items[1]])),
+    power: r2(mean([items[2], items[3]])),
+    accountability: r2(mean([items[4], items[5], items[6], items[7]]))
+  };
+}
+const validAnswers = a => Array.isArray(a) && a.length === 8 && a.every(v => Number.isInteger(v) && v >= 1 && v <= 5);
+
 /* ---------- API (real or demo) ---------- */
 const DEMO = !CONFIG.API_URL;
 const MOCK = {
   min: 4,
   password: "demo",
   teams: {
-    DEMO01: { key: "demo", name: "Credit Risk Analytics", level: "W2", prediction: { safety: 4, power: 3.5, accountability: 4 },
+    DEMO01: { key: "demo", name: "Credit Risk Analytics", level: "W2", prediction: predFromItems([4,5,4,3,4,3,4,5]),
       responses: [[4,4,4,4,4,3,4,3],[5,4,4,5,4,4,4,4],[4,3,3,3,4,3,3,3],[2,2,2,1,3,3,2,2],[4,4,3,4,5,4,4,3],[3,2,2,2,4,3,3,2],[5,5,4,4,4,4,5,4],[4,4,4,3,4,4,4,4],[2,1,2,2,3,2,3,1]] },
-    DEMO02: { key: "demo2", name: "Collections Strategy", level: "W3", prediction: { safety: 3.5, power: 3, accountability: 4.5 },
+    DEMO02: { key: "demo2", name: "Collections Strategy", level: "W3", prediction: predFromItems([4,3,3,3,5,4,4,5]),
       responses: [[2,3,2,2,5,4,4,4],[2,2,3,2,4,5,4,3],[3,2,2,3,5,4,4,4],[2,2,2,2,4,4,3,3],[1,2,2,1,5,5,4,4],[3,3,3,3,4,4,4,4],[2,2,2,2,4,4,4,3]] },
-    DEMO03: { key: "demo3", name: "Customer Insights", level: "W3", prediction: { safety: 4, power: 4, accountability: 3.5 },
+    DEMO03: { key: "demo3", name: "Customer Insights", level: "W3", prediction: predFromItems([4,4,4,4,4,3,3,4]),
       responses: [[4,4,3,3,3,3,3,3],[3,3,3,3,4,3,3,3]] },
-    DEMO04: { key: "demo4", name: "Card Operations", level: "W2", prediction: { safety: 4.5, power: 4, accountability: 4 },
+    DEMO04: { key: "demo4", name: "Card Operations", level: "W2", prediction: predFromItems([5,4,4,4,4,4,4,4]),
       responses: [[4,4,3,4,2,2,3,3],[5,4,4,4,3,2,2,3],[4,5,3,3,2,2,2,2],[4,4,4,4,3,2,3,3],[5,5,4,4,2,3,2,3]] }
   },
   created: {}
@@ -351,11 +363,11 @@ const MOCK = {
 
 const mock = {
   createTeam(p) {
-    if (!p.name || !p.level) return { ok: false, error: "invalid" };
+    if (!p.name || !p.level || !validAnswers(p.predItems)) return { ok: false, error: "invalid" };
     const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
     let code; do { code = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join(""); } while (MOCK.teams[code]);
     const key = Math.random().toString(36).slice(2, 12) + Math.random().toString(36).slice(2, 12);
-    MOCK.teams[code] = { key, name: p.name, level: p.level, prediction: { safety: +p.predSafety, power: +p.predPower, accountability: +p.predAccountability }, responses: [] };
+    MOCK.teams[code] = { key, name: p.name, level: p.level, prediction: predFromItems(p.predItems.slice()), responses: [] };
     return { ok: true, code, key };
   },
   getTeam(p) {
@@ -365,7 +377,7 @@ const mock = {
   submit(p) {
     const t = MOCK.teams[String(p.code || "").toUpperCase()];
     if (!t) return { ok: false, error: "not_found" };
-    if (!Array.isArray(p.answers) || p.answers.length !== 8 || p.answers.some(v => !Number.isInteger(v) || v < 1 || v > 5)) return { ok: false, error: "invalid" };
+    if (!validAnswers(p.answers)) return { ok: false, error: "invalid" };
     t.responses.push(p.answers.slice());
     return { ok: true };
   },
@@ -536,15 +548,12 @@ function viewStart() {
           ${["W2", "W3", "Other"].map(l => `<label><input type="radio" name="level" value="${l}"><span>${l}</span></label>`).join("")}
         </div>
       </div>
-      <div style="margin-top:28px">
-        <h3>Your prediction</h3>
-        <p class="hint">Before your team answers: where do you think they would place the team? Be honest. The gap between your prediction and their answers is the most useful part of the results.</p>
-        <div class="predict-grid">
-          <div>
-            ${slider("ps", "How safe does your team feel to speak up and be themselves?", "Unsafe", "Safe")}
-            ${slider("pp", "How much influence does your team feel it has over decisions?", "Very little", "A lot")}
-            ${slider("pa", "How clear and high is the bar in your team?", "Low", "High")}
-          </div>
+      <div style="margin-top:32px">
+        <h3>How do you think your team would rate these statements?</h3>
+        <p class="hint">Answer as you think your team would, on average. Think about everyone, including the quieter voices, not just the people you hear from most. The gap between your prediction and their answers is the most useful part of your results.</p>
+        ${QUESTIONS.map((q, i) => scaleQ("p" + i, i, q.lead)).join("")}
+        <div class="callout" style="margin-top:8px">
+          <p class="small muted" style="margin:0 0 4px">Where your prediction places your team</p>
           <div class="chart" id="predchart" aria-hidden="true"></div>
         </div>
       </div>
@@ -552,41 +561,62 @@ function viewStart() {
       <div class="actions"><button class="btn" type="submit" id="cbtn">Create my team check</button></div>
     </form>
   </section>`);
+  const picked = prefix => QUESTIONS.map((q, i) => { const c = document.querySelector(`input[name=${prefix}${i}]:checked`); return c ? +c.value : null; });
   const draw = () => {
-    const ps = +$("#ps").value, pa = +$("#pa").value;
-    ["ps", "pp", "pa"].forEach(id => { $("#" + id + "-o").textContent = (+$("#" + id).value).toFixed(1); });
-    $("#predchart").innerHTML = chart(Object.assign({}, EDM, { pred: { x: pa, y: ps }, aria: "Your prediction on the zones graph" }));
+    const v = picked("p");
+    const sa = [v[0], v[1]].filter(x => x !== null), ac = [v[4], v[5], v[6], v[7]].filter(x => x !== null);
+    const pred = sa.length && ac.length ? { x: mean(ac), y: mean(sa) } : null;
+    $("#predchart").innerHTML = chart(Object.assign({}, EDM, { pred, aria: "Your prediction on the zones graph" }));
   };
-  ["ps", "pp", "pa"].forEach(id => $("#" + id).addEventListener("input", draw));
+  $("#create").addEventListener("change", ev => {
+    if (ev.target.name && ev.target.name[0] === "p") { draw(); clearMissing(ev.target); }
+  });
   draw();
   $("#create").addEventListener("submit", async ev => {
     ev.preventDefault();
     const name = $("#tname").value.trim();
     const lv = document.querySelector('input[name=level]:checked');
+    const items = picked("p");
     const err = $("#cerr");
-    const missing = [];
-    if (!name) missing.push("your team's name");
-    if (!lv) missing.push("your level");
-    if (missing.length) { err.hidden = false; err.textContent = "Add " + missing.join(" and ") + " to create your team check."; return; }
+    const fields = [];
+    if (!name) fields.push("your team's name");
+    if (!lv) fields.push("your level");
+    const gaps = items.map((a, i) => a === null ? i + 1 : null).filter(Boolean);
+    document.querySelectorAll("#create .q").forEach((el, i) => el.classList.toggle("missing", items[i] === null));
+    const msgs = [];
+    if (fields.length) msgs.push("Add " + fields.join(" and ") + ".");
+    if (gaps.length) msgs.push(gaps.length === 8 ? "Answer all 8 statements." : "Answer statement" + (gaps.length > 1 ? "s " + gaps.slice(0, -1).join(", ") + " and " + gaps[gaps.length - 1] : " " + gaps[0]) + ".");
+    if (msgs.length) { err.hidden = false; err.textContent = msgs.join(" "); return; }
     err.hidden = true;
     const btn = $("#cbtn"); btn.disabled = true; btn.textContent = "Creating";
     try {
-      const res = await api("createTeam", { name, level: lv.value, predSafety: +$("#ps").value, predPower: +$("#pp").value, predAccountability: +$("#pa").value });
+      const res = await api("createTeam", { name, level: lv.value, predItems: items });
       if (!res.ok) throw new Error(res.error);
       viewCreated(res.code, res.key, name);
     } catch (e) {
-      err.hidden = false; err.textContent = "Your team check wasn't created. Check your connection and try again.";
+      err.hidden = false;
+      err.textContent = "Your team check wasn't created. Check your connection and try again." + (e && e.message && e.message !== "network" ? " (" + e.message + ")" : "");
       btn.disabled = false; btn.textContent = "Create my team check";
     }
   });
 }
 
-function slider(id, label, lo, hi) {
-  return `<div class="slider">
-    <div class="top"><label for="${id}">${esc(label)}</label><output id="${id}-o" for="${id}">3.0</output></div>
-    <input type="range" id="${id}" min="1" max="5" step="0.5" value="3">
-    <div class="ends"><span>${esc(lo)}</span><span>${esc(hi)}</span></div>
-  </div>`;
+/* Once a statement is answered, stop marking it as missing. */
+function clearMissing(input) {
+  const q = input.closest(".q");
+  if (q) q.classList.remove("missing");
+  const form = input.closest("form");
+  if (form && !form.querySelector(".q.missing")) { const e = form.querySelector(".error"); if (e && /statement/.test(e.textContent)) e.hidden = true; }
+}
+
+/* One statement with a 1 to 5 scale. Used in the survey and the leader's prediction. */
+function scaleQ(name, i, text) {
+  const words = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
+  return `<fieldset class="q" id="${name}-q" style="border:0;margin:0;padding-left:0;padding-right:0">
+    <legend class="qtext" style="padding:0"><span class="qnum">${i + 1}</span><span>${esc(text)}</span></legend>
+    <div class="scale">${[1, 2, 3, 4, 5].map(v => `<label><input type="radio" name="${name}" value="${v}" aria-label="${v}: ${words[v - 1]}"><span>${v}</span></label>`).join("")}</div>
+    <div class="scale-ends"><span>Strongly disagree</span><span>Strongly agree</span></div>
+  </fieldset>`;
 }
 
 function viewCreated(code, key, name) {
@@ -666,6 +696,7 @@ async function viewSurvey(code) {
     <p class="error" id="serr" hidden></p>
     <div class="actions"><button class="btn" type="submit" id="sbtn">Submit my answers</button></div>
   </form>`);
+  $("#survey").addEventListener("change", ev => clearMissing(ev.target));
   $("#survey").addEventListener("submit", async ev => {
     ev.preventDefault();
     const answers = QUESTIONS.map((q, i) => { const c = document.querySelector(`input[name=a${i}]:checked`); return c ? +c.value : null; });
@@ -730,11 +761,17 @@ async function viewResults(code, key) {
     const say = Math.abs(d) < 0.25 ? "As expected" : (d < 0 ? "Lower than expected" : "Higher than expected");
     return `<tr><th>${label}</th><td class="num">${fmt(pv)}</td><td class="num">${fmt(av)}</td><td>${say}</td></tr>`;
   };
+  const items = Array.isArray(p.items) && p.items.length === 8 ? p.items : null;
   const groups = ["safety", "power", "accountability"];
-  const bars = groups.map(dim => `<p class="group-h">${DIMS[dim]}</p>` + QUESTIONS.map((q, i) => q.dim !== dim ? "" : `
-      <div class="bar"><div class="lbl"><span>${esc(q.short)}: <span class="muted">${esc(q.text)}</span></span><b>${fmt(r.itemAverages[i])}</b></div>
-      <div class="track"><div class="fill" style="width:${(r.itemAverages[i] - 1) / 4 * 100}%"></div></div></div>`).join("")).join("");
-  const lowAcc = QUESTIONS.map((q, i) => ({ q, v: r.itemAverages[i] })).filter(o => o.q.dim === "accountability").sort((m, n) => m.v - n.v)[0];
+  const bars = groups.map(dim => `<p class="group-h">${DIMS[dim]}</p>` + QUESTIONS.map((q, i) => {
+    if (q.dim !== dim) return "";
+    const v = r.itemAverages[i], pv = items ? items[i] : null;
+    const d = pv === null ? 0 : v - pv;
+    const note = pv === null ? "" : `<div class="gapnote">You predicted ${pv}.${Math.abs(d) >= 0.75 ? (d < 0 ? " Your team rates this lower." : " Your team rates this higher.") : ""}</div>`;
+    return `<div class="bar"><div class="lbl"><span>${esc(q.text)}</span><b>${fmt(v)}</b></div>
+      <div class="track"><div class="fill" style="width:${(v - 1) / 4 * 100}%"></div>${pv === null ? "" : `<span class="pm" style="left:${(pv - 1) / 4 * 100}%" title="Your prediction"></span>`}</div>${note}</div>`;
+  }).join("")).join("");
+  const biggest = items ? QUESTIONS.map((q, i) => ({ q, v: r.itemAverages[i], pv: items[i], d: r.itemAverages[i] - items[i] })).sort((m, n) => Math.abs(n.d) - Math.abs(m.d))[0] : null;
 
   render(`${head}
   <div class="zone-hero reveal" style="background:${Z.color}">
@@ -764,7 +801,8 @@ async function viewResults(code, key) {
 
   <section class="panel">
     <h2>Statement by statement</h2>
-    <p class="muted small">Average score for each statement, from 1 (strongly disagree) to 5 (strongly agree). Lowest accountability statement: <b>${esc(lowAcc.q.short)}</b>.</p>
+    <p class="muted small">The bar is your team's average, from 1 (strongly disagree) to 5 (strongly agree).${items ? " The ring is your prediction." : ""}</p>
+    ${biggest && Math.abs(biggest.d) >= 0.5 ? `<div class="callout"><b>Your biggest gap:</b> ${esc(biggest.q.short.toLowerCase())}. You predicted ${biggest.pv}; your team says ${fmt(biggest.v)}.</div>` : ""}
     <div class="bars">${bars}</div>
   </section>
 

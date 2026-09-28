@@ -4,169 +4,177 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>In the Zone</title>
-<meta name="description" content="A two-minute anonymous team check on safety, influence and accountability.">
+<meta name="description" content="A two-minute anonymous team check on safety, influence and standards.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=Jost:wght@400..700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #F4F6F9;
+  --page: #000000;
+  --page-ink: #FFFFFF;
+  --page-soft: #BDBDBD;
+  --bg: #F4F4F4;
   --surface: #FFFFFF;
-  --ink: #141B2B;
-  --ink-soft: #5B6474;
-  --line: #E1E6ED;
-  --line-strong: #C9D1DC;
+  --ink: #000000;
+  --ink-soft: #6F6767;
+  --line: #E5E5E5;
+  --line-strong: #CFCFCF;
+  --grey-btn: #DCDCDC;
   --learning: #0E7C6B;
   --comfort: #4F7FAE;
   --anxiety: #C98A0B;
   --apathy: #7F7590;
-  --danger: #B42318;
-  --focus: rgba(20,27,43,.18);
+  --danger: #C4271D;
   --field-learning: rgba(14,124,107,.10);
   --field-comfort: rgba(79,127,174,.09);
   --field-anxiety: rgba(201,138,11,.10);
   --field-apathy: rgba(127,117,144,.10);
-  --radius-lg: 16px;
-  --radius-sm: 10px;
-  --display: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --shadow: 0 1px 2px rgba(16,24,40,.04), 0 1px 3px rgba(16,24,40,.03);
+  --display: "Jost", "Futura", "Century Gothic", "Trebuchet MS", sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0F141D;
-    --surface: #171E2A;
-    --ink: #E9EDF3;
-    --ink-soft: #9AA5B5;
-    --line: #273142;
-    --line-strong: #364257;
+    --bg: #1E1E1E;
+    --surface: #141414;
+    --ink: #F2F2F2;
+    --ink-soft: #A8A1A1;
+    --line: #2C2C2C;
+    --line-strong: #3D3D3D;
+    --grey-btn: #2E2E2E;
     --learning: #3FBFA6;
     --comfort: #7FA9D6;
     --anxiety: #E6B447;
     --apathy: #AFA5C2;
     --danger: #F2837A;
-    --focus: rgba(233,237,243,.22);
     --field-learning: rgba(63,191,166,.12);
     --field-comfort: rgba(127,169,214,.11);
     --field-anxiety: rgba(230,180,71,.11);
     --field-apathy: rgba(175,165,194,.11);
-    --shadow: none;
   }
   .zone-hero { color: #0E1520 !important; }
 }
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; background: var(--page); }
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--ink);
+  background: var(--page);
+  color: var(--page-ink);
   font-family: var(--body);
   font-size: 16px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "cv11", "ss01";
 }
 a { color: inherit; }
 .wrap { max-width: 680px; margin: 0 auto; padding: 0 16px; }
+
+/* Everything on a white block reads in black */
+.panel, .note, .stat, .callout, .demo { color: var(--ink); }
+
 .brandbar {
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
-  padding: 20px 0 8px; font-size: 13px; color: var(--ink-soft);
+  padding: 20px 0 10px; font-size: 13px; color: var(--page-soft);
+  border-bottom: 1px solid #262626;
 }
-.brandbar b { color: var(--ink); font-weight: 600; }
+.brandbar b { color: var(--page-ink); font-weight: 600; }
 .demo {
-  background: var(--ink); color: var(--bg); font-size: 13px;
-  padding: 10px 14px; border-radius: var(--radius-sm); margin: 8px 0 0;
+  background: var(--surface); font-size: 13px;
+  padding: 10px 14px; margin: 12px 0 0;
 }
 .demo button { font: inherit; color: inherit; background: none; border: 0; padding: 0 0 1px; margin-right: 12px; text-decoration: underline; cursor: pointer; }
-main { padding: 28px 0 64px; }
+main { padding: 32px 0 64px; }
 h1, h2, h3 { font-family: var(--display); line-height: 1.15; margin: 0; }
 .wordmark {
-  font-weight: 800; font-size: clamp(48px, 12vw, 84px);
-  letter-spacing: -0.05em; line-height: .95; margin: 8px 0 18px;
+  font-family: var(--display); font-weight: 600; font-size: clamp(50px, 12.5vw, 88px);
+  letter-spacing: -0.01em; line-height: .95; margin: 8px 0 20px;
 }
-h1.page { font-size: clamp(28px, 6.5vw, 40px); font-weight: 700; letter-spacing: -0.035em; margin-bottom: 12px; }
-h2 { font-size: 20px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 8px; }
-h3 { font-size: 16px; font-weight: 650; letter-spacing: -0.01em; margin-bottom: 6px; }
+h1.page { font-size: clamp(28px, 6.5vw, 40px); font-weight: 600; letter-spacing: 0; margin-bottom: 12px; }
+h2 { font-size: 17px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
 p { margin: 0 0 14px; }
-.lede { font-size: 18px; color: var(--ink-soft); max-width: 34em; letter-spacing: -0.01em; }
-.muted { color: var(--ink-soft); }
+.lede { font-size: 18px; color: var(--page-soft); max-width: 34em; }
+.muted { color: var(--page-soft); }
+.panel .muted, .note .muted, .stat .muted, .callout .muted { color: var(--ink-soft); }
 .small { font-size: 14px; }
 section { margin-top: 32px; }
 .panel {
-  background: var(--surface); border-radius: var(--radius-lg);
-  padding: 24px 22px; border: 1px solid var(--line); box-shadow: var(--shadow);
+  background: var(--surface); border-radius: 0;
+  padding: 26px 22px;
 }
-.panel + .panel { margin-top: 14px; }
+.panel + .panel { margin-top: 16px; }
 .steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
-.steps li { counter-increment: s; position: relative; padding: 0 0 14px 40px; }
+.steps li { counter-increment: s; position: relative; padding: 0 0 16px 42px; color: var(--page-soft); }
+.steps li b { color: var(--page-ink); font-weight: 600; }
 .steps li::before {
-  content: counter(s); position: absolute; left: 0; top: 1px;
-  width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: var(--surface);
-  display: grid; place-items: center; font-weight: 600; font-size: 13px;
+  content: counter(s); position: absolute; left: 0; top: 0;
+  width: 26px; height: 26px; background: var(--page-ink); color: var(--page);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 600; font-size: 14px;
 }
 label.field, .field { display: block; font-weight: 600; font-size: 15px; margin-bottom: 6px; }
 .hint { font-size: 14px; color: var(--ink-soft); margin: -2px 0 10px; }
 input[type=text], input[type=password] {
   width: 100%; font: inherit; color: var(--ink); background: var(--surface);
-  border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 11px 13px;
-  transition: border-color .15s, box-shadow .15s;
+  border: 1px solid var(--line-strong); border-radius: 0; padding: 12px 13px;
 }
-input[type=text]:focus, input[type=password]:focus { border-color: var(--ink); box-shadow: 0 0 0 4px var(--focus); outline: none; }
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.seg { display: inline-flex; background: var(--bg); border-radius: 12px; padding: 4px; gap: 4px; }
+input[type=text]:focus, input[type=password]:focus { border-color: var(--ink); outline: none; box-shadow: inset 0 0 0 1px var(--ink); }
+:focus-visible { outline: 2px solid var(--learning); outline-offset: 2px; }
+.seg { display: inline-flex; border: 1px solid var(--line-strong); }
 .seg label {
-  min-width: 72px; text-align: center; cursor: pointer;
-  border-radius: 9px; padding: 8px 14px; font-weight: 500; font-size: 15px; color: var(--ink-soft);
-  transition: background .15s, color .15s;
+  min-width: 76px; text-align: center; cursor: pointer; padding: 9px 16px;
+  font-family: var(--display); font-weight: 500; font-size: 14px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--ink-soft); border-left: 1px solid var(--line-strong);
 }
+.seg label:first-child { border-left: 0; }
 .seg input { position: absolute; opacity: 0; pointer-events: none; }
-.seg label:has(input:checked) { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(16,24,40,.12); }
-.seg label:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 1px; }
+.seg label:has(input:checked) { background: var(--ink); color: var(--surface); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--learning); outline-offset: 2px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none;
-  border-radius: 10px; padding: 12px 20px; border: 1px solid var(--ink);
-  background: var(--ink); color: var(--surface); transition: opacity .15s, background .15s;
+  font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: .1em; text-transform: uppercase;
+  cursor: pointer; text-decoration: none; border-radius: 0; padding: 14px 24px;
+  border: 1px solid var(--ink); background: var(--ink); color: var(--surface);
 }
-.btn:hover { opacity: .9; }
-.btn.secondary { background: var(--surface); color: var(--ink); border-color: var(--line-strong); }
-.btn.secondary:hover { opacity: 1; border-color: var(--ink-soft); }
-.btn.small { padding: 7px 13px; font-size: 14px; border-radius: 8px; }
+.btn:hover { opacity: .85; }
+.btn.secondary { background: var(--grey-btn); color: var(--ink); border-color: var(--grey-btn); }
+.btn.secondary:hover { opacity: 1; background: var(--line-strong); border-color: var(--line-strong); }
+.btn.small { padding: 8px 14px; font-size: 12px; }
 .btn[disabled] { opacity: .5; cursor: progress; }
+main > .actions .btn { background: var(--page-ink); color: var(--page); border-color: var(--page-ink); }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
 .linkbox { display: flex; gap: 8px; align-items: stretch; margin: 8px 0; }
 .linkbox code {
   flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--body); font-size: 13px;
-  background: var(--bg); border-radius: 8px; padding: 9px 12px; color: var(--ink-soft);
+  background: var(--bg); padding: 9px 12px; color: var(--ink-soft);
 }
 textarea {
   width: 100%; font: inherit; font-size: 14px; color: var(--ink); background: var(--bg);
-  border: 0; border-radius: var(--radius-sm); padding: 12px; min-height: 150px; resize: vertical;
+  border: 0; border-radius: 0; padding: 12px; min-height: 150px; resize: vertical;
 }
-.warn { border-left: 3px solid var(--anxiety); padding: 4px 0 4px 12px; margin: 12px 0; }
 .error { color: var(--danger); font-weight: 600; font-size: 15px; margin-top: 12px; }
-.note { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px 18px; font-size: 14px; margin: 18px 0; color: var(--ink-soft); }
-.note b { color: var(--ink); font-weight: 600; }
-.q { padding: 20px 0; border-top: 1px solid var(--line); }
-.q:first-of-type { border-top: 0; padding-top: 4px; }
+.note { background: var(--surface); padding: 18px 20px; font-size: 14px; margin: 20px 0; }
+.note b { font-weight: 600; }
+.note p { color: var(--ink-soft); }
+.q { padding: 28px 0; border-top: 1px solid var(--line); }
+.q:first-of-type { border-top: 0; padding-top: 6px; }
 .q.missing .qtext { color: var(--danger); }
-.qtext { font-weight: 500; font-size: 16px; margin-bottom: 12px; display: flex; gap: 12px; letter-spacing: -0.01em; }
-.qnum { color: var(--ink-soft); min-width: 1.1em; font-weight: 500; font-variant-numeric: tabular-nums; }
-.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.qtext { font-weight: 500; font-size: 16px; margin-bottom: 14px; display: flex; gap: 12px; }
+.qnum { font-family: var(--display); color: var(--ink-soft); min-width: 1.1em; font-weight: 500; }
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
 .scale label {
-  border: 1px solid var(--line-strong); border-radius: 10px; text-align: center;
-  padding: 10px 0; cursor: pointer; font-weight: 600; font-size: 15px; color: var(--ink-soft);
-  background: var(--surface); transition: border-color .15s, background .15s, color .15s;
+  border: 1px solid var(--line-strong); text-align: center; cursor: pointer;
+  padding: 9px 3px 8px; color: var(--ink-soft); background: var(--surface);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px;
 }
-.scale label:hover { border-color: var(--ink-soft); color: var(--ink); }
+.scale .n { font-family: var(--display); font-weight: 600; font-size: 17px; line-height: 1.1; }
+.scale .w { font-size: 10.5px; line-height: 1.2; letter-spacing: .01em; }
+@media (min-width: 520px) { .scale .w { font-size: 12px; } }
+.scale label:hover { border-color: var(--ink); color: var(--ink); }
 .scale input { position: absolute; opacity: 0; pointer-events: none; }
 .scale label:has(input:checked) { background: var(--ink); border-color: var(--ink); color: var(--surface); }
-.scale label:has(input:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
-.scale-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
-.zone-hero { border-radius: var(--radius-lg); padding: 24px 22px; color: #fff; }
-.zone-hero .k { font-size: 14px; opacity: .9; }
-.zone-hero h2 { font-size: clamp(32px, 8vw, 46px); font-weight: 750; letter-spacing: -0.04em; margin: 2px 0 10px; }
+.scale label:has(input:focus-visible) { outline: 2px solid var(--learning); outline-offset: 2px; }
+.zone-hero { padding: 26px 22px; color: #fff; }
+.zone-hero .k { font-family: var(--display); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; opacity: .9; }
+.zone-hero h2 { font-size: clamp(30px, 8vw, 44px); font-weight: 600; letter-spacing: .04em; margin: 4px 0 10px; }
 .zone-hero p { margin: 0; max-width: 34em; font-size: 15px; }
 .chart svg { width: 100%; max-width: 440px; height: auto; display: block; margin: 4px auto 0; }
 .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 18px; font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
@@ -177,22 +185,22 @@ textarea {
 .gap-table th { font-weight: 600; }
 .gap-table td.num { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .bars { margin: 6px 0 0; }
-.bar { margin: 14px 0; }
+.bar { margin: 16px 0; }
 .bar .lbl { display: flex; justify-content: space-between; gap: 12px; font-size: 14px; }
-.bar .lbl b { font-weight: 650; font-variant-numeric: tabular-nums; }
-.bar .track { position: relative; height: 8px; background: var(--bg); border-radius: 999px; margin-top: 7px; }
-.bar .fill { height: 100%; border-radius: 999px; background: var(--ink); }
+.bar .lbl b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.bar .track { position: relative; height: 8px; background: var(--bg); margin-top: 7px; }
+.bar .fill { height: 100%; background: var(--ink); }
 .bar .pm { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; border: 2px solid var(--ink); background: var(--surface); }
 .bar .gapnote { font-size: 12.5px; color: var(--ink-soft); margin-top: 5px; }
-.group-h { font-weight: 650; font-size: 14px; letter-spacing: -0.01em; margin: 24px 0 0; color: var(--ink-soft); }
-.callout { background: var(--bg); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px; margin-top: 12px; }
+.group-h { font-family: var(--display); font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin: 26px 0 0; color: var(--ink-soft); }
+.callout { background: var(--bg); padding: 12px 14px; font-size: 14px; margin-top: 12px; }
 ol.qs { padding-left: 20px; margin: 0; }
 ol.qs li { margin: 8px 0; padding-left: 4px; }
-.progress { height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden; margin: 14px 0; }
-.progress div { height: 100%; background: var(--learning); border-radius: 999px; }
+.progress { height: 8px; background: var(--bg); overflow: hidden; margin: 14px 0; }
+.progress div { height: 100%; background: var(--learning); }
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 14px; }
-.stat b { display: block; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.stat { background: var(--surface); padding: 14px; }
+.stat b { display: block; font-family: var(--display); font-size: 28px; font-weight: 600; line-height: 1.1; }
 .stat span { font-size: 13px; color: var(--ink-soft); }
 .tablewrap { overflow-x: auto; margin-top: 10px; }
 table.teams { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
@@ -202,8 +210,8 @@ table.teams thead th { font-weight: 500; color: var(--ink-soft); font-size: 13px
 .toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
 .toggle input { width: 16px; height: 16px; accent-color: var(--ink); }
 .center { text-align: center; }
-.spinner { padding: 60px 0; text-align: center; color: var(--ink-soft); }
-footer { padding: 0 0 40px; font-size: 12px; color: var(--ink-soft); }
+.spinner { padding: 60px 0; text-align: center; color: var(--page-soft); }
+footer { padding: 20px 0 40px; font-size: 12px; color: var(--page-soft); border-top: 1px solid #262626; }
 @media (prefers-reduced-motion: no-preference) {
   .reveal { animation: rise .4s ease-out both; }
   @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -243,7 +251,8 @@ const QUESTIONS = [
   { text: "I'm challenged to grow, not just to get through the work.", lead: "People are challenged to grow, not just to get through the work.", short: "Stretch", dim: "accountability" },
   { text: "The same bar applies to everyone in this team.", lead: "The same bar applies to everyone in this team.", short: "Fairness", dim: "accountability" }
 ];
-const DIMS = { safety: "Safety", power: "Influence", accountability: "Accountability" };
+const SCALE_WORDS = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
+const DIMS = { safety: "Safety", power: "Influence", accountability: "Standards" };
 
 const ZONES = {
   learning: {
@@ -268,7 +277,7 @@ const REFLECT = [
   "What surprised you, and what didn't?",
   "Which zone is your team in? Is that where you'd have placed it?",
   "Who is outside the cluster on the power and safety graph? What might they be carrying that you don't see?",
-  "Which accountability statement scored lowest? What does that say about clarity, follow-through, stretch or fairness in your team?",
+  "Which standards statement scored lowest? What does that say about clarity, follow-through, stretch or fairness in your team?",
   "What's one thing in your control that would move your team one step towards the learning zone?"
 ];
 const TEAM_QS = [
@@ -517,7 +526,7 @@ function legend(items) {
   return `<div class="legend">${items.map(([k, t]) => `<span>${svgVars(icon[k])}${esc(t)}</span>`).join("")}</div>`;
 }
 
-const EDM = { xLow: "Low", xHigh: "High", xTitle: "Accountability", yLow: "Low", yHigh: "High", yTitle: "Psychological safety", zones: true };
+const EDM = { xLow: "Low", xHigh: "High", xTitle: "Standards", yLow: "Low", yHigh: "High", yTitle: "Psychological safety", zones: true };
 const PWR = { xLow: "Less power", xHigh: "More power", xTitle: "Influence", yLow: "Unsafe", yHigh: "Safe", yTitle: "Safety" };
 
 /* ---------- views: start ---------- */
@@ -550,7 +559,7 @@ function viewStart() {
       </div>
       <div style="margin-top:32px">
         <h3>How do you think your team would rate these statements?</h3>
-        <p class="hint">Answer as you think your team would, on average. Think about everyone, including the quieter voices, not just the people you hear from most. The gap between your prediction and their answers is the most useful part of your results.</p>
+        <p class="hint" style="margin-bottom:22px">Answer as you think your team would, on average. Think about everyone, including the quieter voices, not just the people you hear from most. The gap between your prediction and their answers is the most useful part of your results.</p>
         ${QUESTIONS.map((q, i) => scaleQ("p" + i, i, q.lead)).join("")}
         <div class="callout" style="margin-top:8px">
           <p class="small muted" style="margin:0 0 4px">Where your prediction places your team</p>
@@ -611,11 +620,9 @@ function clearMissing(input) {
 
 /* One statement with a 1 to 5 scale. Used in the survey and the leader's prediction. */
 function scaleQ(name, i, text) {
-  const words = ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"];
   return `<fieldset class="q" id="${name}-q" style="border:0;margin:0;padding-left:0;padding-right:0">
     <legend class="qtext" style="padding:0"><span class="qnum">${i + 1}</span><span>${esc(text)}</span></legend>
-    <div class="scale">${[1, 2, 3, 4, 5].map(v => `<label><input type="radio" name="${name}" value="${v}" aria-label="${v}: ${words[v - 1]}"><span>${v}</span></label>`).join("")}</div>
-    <div class="scale-ends"><span>Strongly disagree</span><span>Strongly agree</span></div>
+    <div class="scale">${[1, 2, 3, 4, 5].map(v => `<label><input type="radio" name="${name}" value="${v}" aria-label="${v}: ${SCALE_WORDS[v - 1]}"><span class="n">${v}</span><span class="w">${SCALE_WORDS[v - 1]}</span></label>`).join("")}</div>
   </fieldset>`;
 }
 
@@ -685,14 +692,7 @@ async function viewSurvey(code) {
     <p style="margin:0">We store only your 8 answers and the time you submitted. No names, emails or device details.</p>
   </div>
   <form id="survey" class="panel" novalidate>
-    ${QUESTIONS.map((q, i) => `
-    <fieldset class="q" id="q${i}" style="border:0;margin:0;padding-left:0;padding-right:0">
-      <legend class="qtext" style="padding:0"><span class="qnum">${i + 1}</span><span>${esc(q.text)}</span></legend>
-      <div class="scale">
-        ${[1, 2, 3, 4, 5].map(v => `<label><input type="radio" name="a${i}" value="${v}" aria-label="${v}: ${["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"][v - 1]}"><span>${v}</span></label>`).join("")}
-      </div>
-      <div class="scale-ends"><span>Strongly disagree</span><span>Strongly agree</span></div>
-    </fieldset>`).join("")}
+    ${QUESTIONS.map((q, i) => scaleQ("a" + i, i, q.text)).join("")}
     <p class="error" id="serr" hidden></p>
     <div class="actions"><button class="btn" type="submit" id="sbtn">Submit my answers</button></div>
   </form>`);
@@ -706,7 +706,7 @@ async function viewSurvey(code) {
     if (missing.length) {
       err.hidden = false;
       err.textContent = "Answer all 8 statements to submit. Still to answer: " + missing.join(", ") + ".";
-      $("#q" + (missing[0] - 1)).scrollIntoView({ behavior: "smooth", block: "center" });
+      $("#a" + (missing[0] - 1) + "-q").scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
     err.hidden = true;
@@ -782,12 +782,12 @@ async function viewResults(code, key) {
 
   <section class="panel">
     <h2>Where your team sits</h2>
-    <p class="muted small">Psychological safety against accountability, after Amy Edmondson. The filled dot is your team's average. The ring is your prediction.</p>
+    <p class="muted small">Psychological safety against standards, after Amy Edmondson. The filled dot is your team's average. The ring is your prediction.</p>
     <div class="chart">${chart(Object.assign({}, EDM, { avg: { x: a.accountability, y: a.safety }, pred: { x: p.accountability, y: p.safety }, avgColor: Z.color, aria: "Team average on the zones graph" }))}</div>
     ${legend([["avg", "Team average"], ["pred", "Your prediction"]])}
     <table class="gap-table">
       <thead><tr><th></th><th>You predicted</th><th>Team says</th><th></th></tr></thead>
-      <tbody>${gapRow("Safety", p.safety, a.safety)}${gapRow("Influence", p.power, a.power)}${gapRow("Accountability", p.accountability, a.accountability)}</tbody>
+      <tbody>${gapRow("Safety", p.safety, a.safety)}${gapRow("Influence", p.power, a.power)}${gapRow("Standards", p.accountability, a.accountability)}</tbody>
     </table>
     <p class="small muted" style="margin-top:10px">Scores run from 1 to 5. The dashed lines sit at 3.</p>
   </section>
@@ -887,7 +887,7 @@ async function loadAdmin() {
   <section class="panel">
     <h2>All teams</h2>
     <div class="tablewrap"><table class="teams">
-      <thead><tr><th>Team</th><th>Level</th><th>Responses</th><th>Safety</th><th>Influence</th><th>Accountability</th><th>Zone</th><th></th></tr></thead>
+      <thead><tr><th>Team</th><th>Level</th><th>Responses</th><th>Safety</th><th>Influence</th><th>Standards</th><th>Zone</th><th></th></tr></thead>
       <tbody>${rows || `<tr><td colspan="8" class="muted">No teams yet. Share the start page with leaders to begin.</td></tr>`}</tbody>
     </table></div>
     <div class="actions"><button class="btn small secondary" id="csv">Download summary (CSV)</button><button class="btn small secondary" id="reload">Refresh</button></div>
@@ -905,7 +905,7 @@ async function loadAdmin() {
   bindCopies();
   $("#reload").addEventListener("click", () => loadAdmin());
   $("#csv").addEventListener("click", () => {
-    const head = ["team", "level", "responses", "safety", "influence", "accountability", "zone", "pred_safety", "pred_influence", "pred_accountability"];
+    const head = ["team", "level", "responses", "safety", "influence", "standards", "zone", "pred_safety", "pred_influence", "pred_standards"];
     const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
     const lines = [head.join(",")].concat(d.teams.map(t => {
       const av = t.averages;

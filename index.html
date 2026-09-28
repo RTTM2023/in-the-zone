@@ -1,0 +1,895 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>In the Zone</title>
+<meta name="description" content="A two-minute anonymous team check on safety, influence and accountability.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #EDF0F3;
+  --surface: #FFFFFF;
+  --ink: #1B2433;
+  --ink-soft: #4A5568;
+  --line: #CCD3DC;
+  --learning: #0E7C6B;
+  --comfort: #4F7FAE;
+  --anxiety: #C98A0B;
+  --apathy: #7F7590;
+  --danger: #B42318;
+  --focus: #2563EB;
+  --field-learning: rgba(14,124,107,.13);
+  --field-comfort: rgba(79,127,174,.12);
+  --field-anxiety: rgba(201,138,11,.13);
+  --field-apathy: rgba(127,117,144,.13);
+  --radius-lg: 18px;
+  --radius-sm: 8px;
+  --display: "Bricolage Grotesque", "Segoe UI", sans-serif;
+  --body: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111722;
+    --surface: #1A2231;
+    --ink: #E8ECF2;
+    --ink-soft: #A7B1C0;
+    --line: #2E3A4E;
+    --learning: #3FBFA6;
+    --comfort: #7FA9D6;
+    --anxiety: #E6B447;
+    --apathy: #AFA5C2;
+    --danger: #F2837A;
+    --focus: #7AA7FF;
+    --field-learning: rgba(63,191,166,.14);
+    --field-comfort: rgba(127,169,214,.13);
+    --field-anxiety: rgba(230,180,71,.13);
+    --field-apathy: rgba(175,165,194,.13);
+  }
+  .zone-hero { color: #0E1520 !important; }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.55;
+}
+a { color: inherit; }
+.wrap { max-width: 680px; margin: 0 auto; padding: 0 16px; }
+.brandbar {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 18px 0 8px; font-size: 14px; color: var(--ink-soft);
+}
+.brandbar b { color: var(--ink); font-weight: 700; }
+.demo {
+  background: var(--ink); color: var(--bg); font-size: 14px;
+  padding: 10px 16px; border-radius: var(--radius-sm); margin: 8px 0 0;
+}
+.demo button { font: inherit; color: inherit; background: none; border: 0; padding: 0 0 1px; margin-right: 12px; text-decoration: underline; cursor: pointer; }
+main { padding: 24px 0 64px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.12; margin: 0; }
+.wordmark {
+  font-family: var(--display); font-weight: 800; font-size: clamp(52px, 13vw, 92px);
+  letter-spacing: -0.035em; line-height: .92; margin: 8px 0 18px;
+}
+.wordmark .in {
+  display: inline-block; background: var(--learning); color: #fff;
+  padding: 0 .12em; border-radius: .12em; margin-right: .06em;
+}
+h1.page { font-size: clamp(30px, 7vw, 44px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; }
+h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 10px; }
+h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+p { margin: 0 0 14px; }
+.lede { font-size: 19px; color: var(--ink-soft); max-width: 34em; }
+.muted { color: var(--ink-soft); }
+.small { font-size: 14px; }
+section { margin-top: 36px; }
+.panel {
+  background: var(--surface); border-radius: var(--radius-lg);
+  padding: 22px 20px; border: 1px solid var(--line);
+}
+.panel + .panel { margin-top: 14px; }
+.steps { list-style: none; padding: 0; margin: 0; counter-reset: s; }
+.steps li { counter-increment: s; position: relative; padding: 0 0 14px 44px; }
+.steps li::before {
+  content: counter(s); position: absolute; left: 0; top: -1px;
+  width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--ink);
+  display: grid; place-items: center; font-family: var(--display); font-weight: 700; font-size: 15px;
+}
+label.field { display: block; font-weight: 700; margin-bottom: 6px; }
+.hint { font-size: 14px; color: var(--ink-soft); margin: -2px 0 8px; }
+input[type=text], input[type=password] {
+  width: 100%; font: inherit; color: var(--ink); background: var(--surface);
+  border: 2px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px;
+}
+input[type=text]:focus, input[type=password]:focus { border-color: var(--ink); outline: none; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.seg { display: flex; flex-wrap: wrap; gap: 8px; }
+.seg label {
+  flex: 1 1 0; min-width: 76px; text-align: center; cursor: pointer;
+  border: 2px solid var(--line); border-radius: var(--radius-sm); padding: 10px 6px;
+  font-weight: 700; background: var(--surface);
+}
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg input:checked + span { color: var(--surface); }
+.seg label:has(input:checked) { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.seg label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.slider { margin: 18px 0 6px; }
+.slider .top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.slider output { font-family: var(--display); font-weight: 700; font-size: 20px; min-width: 2.2em; text-align: right; }
+.slider .ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); }
+input[type=range] { width: 100%; accent-color: var(--ink); margin: 8px 0 2px; height: 28px; }
+.predict-grid { display: grid; gap: 8px 24px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .predict-grid { grid-template-columns: 1fr 250px; align-items: center; } }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font: inherit; font-weight: 700; cursor: pointer; text-decoration: none;
+  border-radius: 999px; padding: 13px 22px; border: 2px solid var(--ink);
+  background: var(--ink); color: var(--surface);
+}
+.btn.secondary { background: transparent; color: var(--ink); }
+.btn.small { padding: 7px 14px; font-size: 15px; }
+.btn[disabled] { opacity: .5; cursor: progress; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.linkbox {
+  display: flex; gap: 8px; align-items: stretch; margin: 8px 0;
+}
+.linkbox code {
+  flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--body); font-size: 14px;
+  background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px;
+}
+textarea {
+  width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--bg);
+  border: 0; border-radius: var(--radius-sm); padding: 12px; min-height: 150px; resize: vertical;
+}
+.warn { border-left: 4px solid var(--anxiety); padding: 4px 0 4px 12px; margin: 12px 0; }
+.error { color: var(--danger); font-weight: 700; margin-top: 12px; }
+.note { background: var(--bg); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 15px; margin: 16px 0; }
+.q { padding: 20px 0; border-top: 1px solid var(--line); }
+.q:first-of-type { border-top: 0; }
+.q.missing .qtext { color: var(--danger); }
+.qtext { font-weight: 700; margin-bottom: 12px; display: flex; gap: 10px; }
+.qnum { font-family: var(--display); color: var(--ink-soft); min-width: 1.2em; }
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.scale label {
+  border: 2px solid var(--line); border-radius: var(--radius-sm); text-align: center;
+  padding: 10px 0; cursor: pointer; font-family: var(--display); font-weight: 700; font-size: 18px;
+  background: var(--surface);
+}
+.scale input { position: absolute; opacity: 0; pointer-events: none; }
+.scale label:has(input:checked) { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.scale label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
+.scale-ends { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-soft); margin-top: 6px; }
+.zone-hero { border-radius: var(--radius-lg); padding: 22px 20px; color: #fff; }
+.zone-hero .k { font-size: 15px; opacity: .9; }
+.zone-hero h2 { font-size: clamp(34px, 9vw, 52px); font-weight: 800; letter-spacing: -0.03em; margin: 2px 0 10px; }
+.zone-hero p { margin: 0; max-width: 34em; }
+.chart svg { width: 100%; max-width: 460px; height: auto; display: block; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--ink-soft); margin-top: 8px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.gap-table { width: 100%; border-collapse: collapse; font-size: 15px; margin-top: 8px; }
+.gap-table th, .gap-table td { text-align: left; padding: 10px 6px; border-top: 1px solid var(--line); vertical-align: top; }
+.gap-table th { font-weight: 700; }
+.gap-table td.num { font-family: var(--display); font-weight: 700; white-space: nowrap; }
+.bars { margin: 10px 0 0; }
+.bar { margin: 12px 0; }
+.bar .lbl { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; }
+.bar .lbl b { font-family: var(--display); }
+.bar .track { height: 10px; background: var(--bg); border-radius: 999px; margin-top: 6px; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 999px; background: var(--ink); }
+.group-h { font-family: var(--display); font-weight: 700; font-size: 16px; margin: 22px 0 0; }
+ol.qs { padding-left: 22px; margin: 0; }
+ol.qs li { margin: 8px 0; }
+.progress { height: 12px; background: var(--bg); border-radius: 999px; overflow: hidden; margin: 12px 0; }
+.progress div { height: 100%; background: var(--learning); border-radius: 999px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stat { background: var(--bg); border-radius: var(--radius-sm); padding: 12px; }
+.stat b { display: block; font-family: var(--display); font-size: 28px; line-height: 1.1; }
+.stat span { font-size: 13px; color: var(--ink-soft); }
+.tablewrap { overflow-x: auto; margin-top: 10px; }
+table.teams { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+table.teams th, table.teams td { text-align: left; padding: 9px 8px; border-top: 1px solid var(--line); }
+table.teams th { font-weight: 700; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+.toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; cursor: pointer; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--ink); }
+.center { text-align: center; }
+.spinner { padding: 60px 0; text-align: center; color: var(--ink-soft); }
+footer { padding: 0 0 40px; font-size: 13px; color: var(--ink-soft); }
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: rise .45s ease-out both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brandbar"><span><b>Run to the Monster</b> in partnership with <b id="partner">WFS</b></span></div>
+  <div id="demo"></div>
+  <main id="app" aria-live="polite"><div class="spinner">Loading</div></main>
+  <footer>In the Zone is a Run to the Monster tool. Team check responses are anonymous.</footer>
+</div>
+<script>
+/* ======================================================================
+   CONFIG: the only part you need to edit
+   ====================================================================== */
+const CONFIG = {
+  // Paste the Google Apps Script web app URL here. Leave empty for demo mode.
+  API_URL: "https://script.google.com/macros/s/AKfycbw4pOU3f2TL5Tp7ez5V8J_kxW-kh_xBagYMmS89L4G42rG2gJW86_NujGLOn_gnGf9C/exec",
+  // Optional: the public address of this page, e.g. "https://runtothemonster.github.io/in-the-zone/"
+  // Leave empty to use the address the page is opened from.
+  SITE_URL: "",
+  // Partner name shown in the header
+  PARTNER: "WFS"
+};
+
+/* ====================================================================== */
+
+const QUESTIONS = [
+  { text: "I feel safe to speak up, disagree or admit a mistake in this team.", short: "Safe to speak up", dim: "safety" },
+  { text: "I can be myself here without having to tone down who I am.", short: "Can be myself", dim: "safety" },
+  { text: "I have real influence over decisions that affect my work.", short: "Influence over decisions", dim: "power" },
+  { text: "When I raise an idea or concern, it is taken seriously and acted on.", short: "Ideas taken seriously", dim: "power" },
+  { text: "I know exactly what's expected of me and what good looks like.", short: "Clarity", dim: "accountability" },
+  { text: "When work falls short, it gets noticed and addressed.", short: "Follow-through", dim: "accountability" },
+  { text: "I'm challenged to grow, not just to get through the work.", short: "Stretch", dim: "accountability" },
+  { text: "The same bar applies to everyone in this team.", short: "Fairness", dim: "accountability" }
+];
+const DIMS = { safety: "Safety", power: "Influence", accountability: "Accountability" };
+
+const ZONES = {
+  learning: {
+    name: "Learning zone", color: "var(--learning)",
+    text: "People feel safe to speak up and are held to a high bar. This is where learning and high performance happen. The work now is keeping it here when pressure rises."
+  },
+  comfort: {
+    name: "Comfort zone", color: "var(--comfort)",
+    text: "People feel safe, but the bar isn't clear or consistently held. It's a warm team that isn't being stretched. The move is to raise the bar: make expectations explicit and follow through."
+  },
+  anxiety: {
+    name: "Anxiety zone", color: "var(--anxiety)",
+    text: "The bar is high, but people don't feel safe to speak, ask for help or admit mistakes, so problems stay hidden. The move is to lower the cost of speaking up: ask before telling, thank people for bad news and treat mistakes as information."
+  },
+  apathy: {
+    name: "Apathy zone", color: "var(--apathy)",
+    text: "Safety is low and the bar is low. People protect themselves rather than invest in the work. The move is to start with trust and relationships, then rebuild purpose and standards."
+  }
+};
+
+const REFLECT = [
+  "What surprised you, and what didn't?",
+  "Which zone is your team in? Is that where you'd have placed it?",
+  "Who is outside the cluster on the power and safety graph? What might they be carrying that you don't see?",
+  "Which accountability statement scored lowest? What does that say about clarity, follow-through, stretch or fairness in your team?",
+  "What's one thing in your control that would move your team one step towards the learning zone?"
+];
+const TEAM_QS = [
+  "Here's what you told me. Does it look right to you?",
+  "What's one thing that would make it easier to speak up in this team?",
+  "What's one thing I should start, stop or continue?"
+];
+
+/* ---------- utilities ---------- */
+const $ = (sel, root = document) => root.querySelector(sel);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const mean = xs => xs.reduce((a, b) => a + b, 0) / xs.length;
+const r2 = x => Math.round(x * 100) / 100;
+const fmt = x => (Math.round(x * 10) / 10).toFixed(1);
+const store = {
+  get(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } }
+};
+
+function zoneOf(safety, acc) {
+  if (safety >= 3 && acc >= 3) return "learning";
+  if (safety >= 3) return "comfort";
+  if (acc >= 3) return "anxiety";
+  return "apathy";
+}
+function nearLine(safety, acc) { return Math.abs(safety - 3) < 0.3 || Math.abs(acc - 3) < 0.3; }
+
+function baseUrl() {
+  if (CONFIG.SITE_URL) return CONFIG.SITE_URL.replace(/[?#].*$/, "");
+  return location.href.replace(/[?#].*$/, "");
+}
+const surveyLink = code => baseUrl() + "?t=" + encodeURIComponent(code);
+const resultsLink = (code, key) => baseUrl() + "?t=" + encodeURIComponent(code) + "&k=" + encodeURIComponent(key);
+
+async function copyText(text, btn) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; } catch (e) {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
+    ta.remove();
+  }
+  if (btn) {
+    const old = btn.textContent;
+    btn.textContent = ok ? "Copied" : "Select and copy";
+    setTimeout(() => { btn.textContent = old; }, 1800);
+  }
+}
+
+function summarise(answers) {
+  const points = answers.map(a => ({ safety: mean([a[0], a[1]]), power: mean([a[2], a[3]]) }));
+  for (let i = points.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [points[i], points[j]] = [points[j], points[i]]; }
+  return {
+    points,
+    itemAverages: [0, 1, 2, 3, 4, 5, 6, 7].map(i => r2(mean(answers.map(a => a[i])))),
+    averages: {
+      safety: r2(mean(answers.map(a => mean([a[0], a[1]])))),
+      power: r2(mean(answers.map(a => mean([a[2], a[3]])))),
+      accountability: r2(mean(answers.map(a => mean([a[4], a[5], a[6], a[7]]))))
+    }
+  };
+}
+
+/* ---------- API (real or demo) ---------- */
+const DEMO = !CONFIG.API_URL;
+const MOCK = {
+  min: 4,
+  password: "demo",
+  teams: {
+    DEMO01: { key: "demo", name: "Credit Risk Analytics", level: "W2", prediction: { safety: 4, power: 3.5, accountability: 4 },
+      responses: [[4,4,4,4,4,3,4,3],[5,4,4,5,4,4,4,4],[4,3,3,3,4,3,3,3],[2,2,2,1,3,3,2,2],[4,4,3,4,5,4,4,3],[3,2,2,2,4,3,3,2],[5,5,4,4,4,4,5,4],[4,4,4,3,4,4,4,4],[2,1,2,2,3,2,3,1]] },
+    DEMO02: { key: "demo2", name: "Collections Strategy", level: "W3", prediction: { safety: 3.5, power: 3, accountability: 4.5 },
+      responses: [[2,3,2,2,5,4,4,4],[2,2,3,2,4,5,4,3],[3,2,2,3,5,4,4,4],[2,2,2,2,4,4,3,3],[1,2,2,1,5,5,4,4],[3,3,3,3,4,4,4,4],[2,2,2,2,4,4,4,3]] },
+    DEMO03: { key: "demo3", name: "Customer Insights", level: "W3", prediction: { safety: 4, power: 4, accountability: 3.5 },
+      responses: [[4,4,3,3,3,3,3,3],[3,3,3,3,4,3,3,3]] },
+    DEMO04: { key: "demo4", name: "Card Operations", level: "W2", prediction: { safety: 4.5, power: 4, accountability: 4 },
+      responses: [[4,4,3,4,2,2,3,3],[5,4,4,4,3,2,2,3],[4,5,3,3,2,2,2,2],[4,4,4,4,3,2,3,3],[5,5,4,4,2,3,2,3]] }
+  },
+  created: {}
+};
+
+const mock = {
+  createTeam(p) {
+    if (!p.name || !p.level) return { ok: false, error: "invalid" };
+    const chars = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    let code; do { code = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join(""); } while (MOCK.teams[code]);
+    const key = Math.random().toString(36).slice(2, 12) + Math.random().toString(36).slice(2, 12);
+    MOCK.teams[code] = { key, name: p.name, level: p.level, prediction: { safety: +p.predSafety, power: +p.predPower, accountability: +p.predAccountability }, responses: [] };
+    return { ok: true, code, key };
+  },
+  getTeam(p) {
+    const t = MOCK.teams[String(p.code || "").toUpperCase()];
+    return t ? { ok: true, name: t.name, level: t.level } : { ok: false, error: "not_found" };
+  },
+  submit(p) {
+    const t = MOCK.teams[String(p.code || "").toUpperCase()];
+    if (!t) return { ok: false, error: "not_found" };
+    if (!Array.isArray(p.answers) || p.answers.length !== 8 || p.answers.some(v => !Number.isInteger(v) || v < 1 || v > 5)) return { ok: false, error: "invalid" };
+    t.responses.push(p.answers.slice());
+    return { ok: true };
+  },
+  results(p) {
+    const code = String(p.code || "").toUpperCase(), t = MOCK.teams[code];
+    if (!t || p.key !== t.key) return { ok: false, error: "not_found" };
+    const out = { ok: true, name: t.name, level: t.level, n: t.responses.length, min: MOCK.min, prediction: t.prediction, locked: t.responses.length < MOCK.min };
+    if (!out.locked) Object.assign(out, summarise(t.responses));
+    return out;
+  },
+  admin(p) {
+    if (p.password !== MOCK.password) return { ok: false, error: "denied" };
+    const all = [];
+    const teams = Object.entries(MOCK.teams).map(([code, t]) => {
+      const unlocked = t.responses.length >= MOCK.min;
+      if (unlocked) all.push(...t.responses);
+      return { code, key: t.key, name: t.name, level: t.level, n: t.responses.length, prediction: t.prediction, averages: unlocked ? summarise(t.responses).averages : null };
+    });
+    const s = all.length ? summarise(all) : null;
+    return { ok: true, min: MOCK.min, teams, cohort: s && s.averages, cohortItems: s && s.itemAverages, cohortN: all.length };
+  }
+};
+
+async function api(action, payload) {
+  if (DEMO) {
+    await new Promise(r => setTimeout(r, 250));
+    return mock[action](payload || {});
+  }
+  const res = await fetch(CONFIG.API_URL, {
+    method: "POST",
+    body: JSON.stringify(Object.assign({ action }, payload || {}))
+  });
+  if (!res.ok) throw new Error("network");
+  return res.json();
+}
+
+/* ---------- routing ---------- */
+let params = new URLSearchParams(location.search);
+function go(query) {
+  params = new URLSearchParams(query);
+  try { history.pushState(null, "", query ? "?" + query : location.pathname); } catch (e) { /* sandboxed preview */ }
+  route();
+  window.scrollTo(0, 0);
+}
+window.addEventListener("popstate", () => { params = new URLSearchParams(location.search); route(); });
+
+function route() {
+  if (params.has("admin")) return viewAdmin();
+  const t = params.get("t"), k = params.get("k");
+  if (t && k) return viewResults(t, k);
+  if (t) return viewSurvey(t);
+  return viewStart();
+}
+const app = () => $("#app");
+function render(html) { app().innerHTML = html; }
+function fail(msg) {
+  render(`<div class="panel reveal"><h1 class="page">Something went wrong</h1><p>${esc(msg)}</p><div class="actions"><button class="btn secondary" onclick="route()">Try again</button></div></div>`);
+}
+
+/* ---------- charts ---------- */
+function chart(o) {
+  const S = 360, L = 46, B = 46, T = 14, R = 14, W = S - L - R, H = S - T - B;
+  const x = v => L + (v - 1) / 4 * W;
+  const y = v => T + (1 - (v - 1) / 4) * H;
+  let g = "";
+  if (o.zones) {
+    g += `<rect x="${L}" y="${T}" width="${W / 2}" height="${H / 2}" fill="var(--field-comfort)"/>`;
+    g += `<rect x="${L + W / 2}" y="${T}" width="${W / 2}" height="${H / 2}" fill="var(--field-learning)"/>`;
+    g += `<rect x="${L}" y="${T + H / 2}" width="${W / 2}" height="${H / 2}" fill="var(--field-apathy)"/>`;
+    g += `<rect x="${L + W / 2}" y="${T + H / 2}" width="${W / 2}" height="${H / 2}" fill="var(--field-anxiety)"/>`;
+    const zl = (tx, ty, anchor, name, col) => `<text x="${tx}" y="${ty}" text-anchor="${anchor}" fill="${col}" font-family="var(--display)" font-weight="700" font-size="14">${name}</text>`;
+    g += zl(L + 10, T + 22, "start", "Comfort", "var(--comfort)");
+    g += zl(L + W - 10, T + 22, "end", "Learning", "var(--learning)");
+    g += zl(L + 10, T + H - 12, "start", "Apathy", "var(--apathy)");
+    g += zl(L + W - 10, T + H - 12, "end", "Anxiety", "var(--anxiety)");
+  }
+  g += `<line x1="${x(3)}" y1="${T}" x2="${x(3)}" y2="${T + H}" stroke="var(--ink-soft)" stroke-dasharray="4 5" stroke-width="1.2"/>`;
+  g += `<line x1="${L}" y1="${y(3)}" x2="${L + W}" y2="${y(3)}" stroke="var(--ink-soft)" stroke-dasharray="4 5" stroke-width="1.2"/>`;
+  g += `<line x1="${L}" y1="${T}" x2="${L}" y2="${T + H}" stroke="var(--ink)" stroke-width="2"/>`;
+  g += `<line x1="${L}" y1="${T + H}" x2="${L + W}" y2="${T + H}" stroke="var(--ink)" stroke-width="2"/>`;
+  const ax = (tx, ty, anchor, txt, extra = "") => `<text x="${tx}" y="${ty}" text-anchor="${anchor}" fill="var(--ink-soft)" font-family="var(--body)" font-size="12.5" ${extra}>${esc(txt)}</text>`;
+  g += ax(L, T + H + 20, "start", o.xLow);
+  g += ax(L + W, T + H + 20, "end", o.xHigh);
+  g += `<text x="${L + W / 2}" y="${T + H + 38}" text-anchor="middle" fill="var(--ink)" font-family="var(--display)" font-weight="700" font-size="14">${esc(o.xTitle)}</text>`;
+  g += `<text transform="translate(${L - 10} ${T + H}) rotate(-90)" text-anchor="start" fill="var(--ink-soft)" font-family="var(--body)" font-size="12.5">${esc(o.yLow)}</text>`;
+  g += `<text transform="translate(${L - 10} ${T}) rotate(-90)" text-anchor="end" fill="var(--ink-soft)" font-family="var(--body)" font-size="12.5">${esc(o.yHigh)}</text>`;
+  g += `<text transform="translate(${L - 28} ${T + H / 2}) rotate(-90)" text-anchor="middle" fill="var(--ink)" font-family="var(--display)" font-weight="700" font-size="14">${esc(o.yTitle)}</text>`;
+
+  // individual dots, spread where they overlap
+  if (o.dots && o.dots.length) {
+    const seen = {};
+    o.dots.forEach(d => {
+      const key = d.x + "," + d.y, k = seen[key] = (seen[key] || 0) + 1;
+      const ang = (k - 1) * 2.4, rad = k === 1 ? 0 : 7 + (k - 2) * 1.6;
+      g += `<circle cx="${x(d.x) + Math.cos(ang) * rad}" cy="${y(d.y) + Math.sin(ang) * rad}" r="6.5" fill="var(--ink)" fill-opacity=".72" stroke="var(--surface)" stroke-width="1.5"/>`;
+    });
+  }
+  // team dots (admin)
+  if (o.teams) {
+    o.teams.forEach(t => {
+      const cx = x(t.x), cy = y(t.y);
+      if (t.level === "W3") g += `<rect x="${cx - 7}" y="${cy - 7}" width="14" height="14" rx="2" fill="var(--ink)" stroke="var(--surface)" stroke-width="1.5"/>`;
+      else g += `<circle cx="${cx}" cy="${cy}" r="8" fill="var(--ink)" stroke="var(--surface)" stroke-width="1.5"/>`;
+      if (o.showLabels) {
+        const right = cx > L + W * 0.55;
+        g += `<text x="${right ? cx - 11 : cx + 11}" y="${cy + 4}" text-anchor="${right ? "end" : "start"}" fill="var(--ink)" font-family="var(--body)" font-size="11.5">${esc(t.label)}</text>`;
+      }
+    });
+  }
+  if (o.pred && o.avg) {
+    g += `<line x1="${x(o.pred.x)}" y1="${y(o.pred.y)}" x2="${x(o.avg.x)}" y2="${y(o.avg.y)}" stroke="var(--ink)" stroke-width="2" stroke-dasharray="2 4"/>`;
+  }
+  if (o.pred) g += `<circle cx="${x(o.pred.x)}" cy="${y(o.pred.y)}" r="11" fill="none" stroke="var(--ink)" stroke-width="3"/>`;
+  if (o.avg) {
+    g += `<circle cx="${x(o.avg.x)}" cy="${y(o.avg.y)}" r="12" fill="${o.avgColor || "var(--learning)"}" stroke="var(--surface)" stroke-width="3"/>`;
+  }
+  return svgVars(`<svg viewBox="0 0 ${S} ${S}" role="img" aria-label="${esc(o.aria || "")}">${g}</svg>`);
+}
+
+/* Moves var(--token) colours from SVG attributes into style, so theme colours apply everywhere. */
+function svgVars(s) {
+  return s.replace(/<(\w+)([^<>]*?)(\/?)>/g, (m, tag, attrs, sl) => {
+    let st = "";
+    attrs = attrs.replace(/\s(fill|stroke|font-family)="(var\([^"]*\))"/g, (mm, k, v) => { st += k + ":" + v + ";"; return ""; });
+    return `<${tag}${attrs}${st ? ` style="${st}"` : ""}${sl}>`;
+  });
+}
+
+function legend(items) {
+  const icon = {
+    avg: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--learning)"/></svg>`,
+    pred: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--ink)" stroke-width="2.5"/></svg>`,
+    dot: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="var(--ink)" fill-opacity=".72"/></svg>`,
+    w2: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="var(--ink)"/></svg>`,
+    w3: `<svg width="16" height="16" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="2" fill="var(--ink)"/></svg>`
+  };
+  return `<div class="legend">${items.map(([k, t]) => `<span>${svgVars(icon[k])}${esc(t)}</span>`).join("")}</div>`;
+}
+
+const EDM = { xLow: "Low", xHigh: "High", xTitle: "Accountability", yLow: "Low", yHigh: "High", yTitle: "Psychological safety", zones: true };
+const PWR = { xLow: "Less power", xHigh: "More power", xTitle: "Influence", yLow: "Unsafe", yHigh: "Safe", yTitle: "Safety" };
+
+/* ---------- views: start ---------- */
+function viewStart() {
+  document.title = "In the Zone";
+  render(`
+  <div class="reveal">
+    <div class="wordmark">In the Zone</div>
+    <p class="lede">A two-minute anonymous team check. It shows how safe your people feel, how much influence they have, and how high the bar is, so you can see which zone your team is really in.</p>
+  </div>
+  <section>
+    <h2>How it works</h2>
+    <ol class="steps">
+      <li><b>Create your team check.</b> Name your team and predict where it sits.</li>
+      <li><b>Send the survey link to your team.</b> It's 8 statements, and answers are anonymous.</li>
+      <li><b>Open your results once 4 people have responded.</b> Compare what your team reports with your prediction.</li>
+    </ol>
+  </section>
+  <section>
+    <form id="create" class="panel" novalidate>
+      <h2>Create your team check</h2>
+      <label class="field" for="tname">Your team's name</label>
+      <p class="hint">Use a name your team will recognise. It appears at the top of their survey.</p>
+      <input type="text" id="tname" maxlength="60" autocomplete="off" placeholder="For example, Credit Risk Analytics">
+      <div style="margin-top:20px">
+        <span class="field" id="lvl-l" style="display:block;font-weight:700;margin-bottom:8px">Your level</span>
+        <div class="seg" role="radiogroup" aria-labelledby="lvl-l">
+          ${["W2", "W3", "Other"].map(l => `<label><input type="radio" name="level" value="${l}"><span>${l}</span></label>`).join("")}
+        </div>
+      </div>
+      <div style="margin-top:28px">
+        <h3>Your prediction</h3>
+        <p class="hint">Before your team answers: where do you think they would place the team? Be honest. The gap between your prediction and their answers is the most useful part of the results.</p>
+        <div class="predict-grid">
+          <div>
+            ${slider("ps", "How safe does your team feel to speak up and be themselves?", "Unsafe", "Safe")}
+            ${slider("pp", "How much influence does your team feel it has over decisions?", "Very little", "A lot")}
+            ${slider("pa", "How clear and high is the bar in your team?", "Low", "High")}
+          </div>
+          <div class="chart" id="predchart" aria-hidden="true"></div>
+        </div>
+      </div>
+      <p class="error" id="cerr" hidden></p>
+      <div class="actions"><button class="btn" type="submit" id="cbtn">Create my team check</button></div>
+    </form>
+  </section>`);
+  const draw = () => {
+    const ps = +$("#ps").value, pa = +$("#pa").value;
+    ["ps", "pp", "pa"].forEach(id => { $("#" + id + "-o").textContent = (+$("#" + id).value).toFixed(1); });
+    $("#predchart").innerHTML = chart(Object.assign({}, EDM, { pred: { x: pa, y: ps }, aria: "Your prediction on the zones graph" }));
+  };
+  ["ps", "pp", "pa"].forEach(id => $("#" + id).addEventListener("input", draw));
+  draw();
+  $("#create").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const name = $("#tname").value.trim();
+    const lv = document.querySelector('input[name=level]:checked');
+    const err = $("#cerr");
+    const missing = [];
+    if (!name) missing.push("your team's name");
+    if (!lv) missing.push("your level");
+    if (missing.length) { err.hidden = false; err.textContent = "Add " + missing.join(" and ") + " to create your team check."; return; }
+    err.hidden = true;
+    const btn = $("#cbtn"); btn.disabled = true; btn.textContent = "Creating";
+    try {
+      const res = await api("createTeam", { name, level: lv.value, predSafety: +$("#ps").value, predPower: +$("#pp").value, predAccountability: +$("#pa").value });
+      if (!res.ok) throw new Error(res.error);
+      viewCreated(res.code, res.key, name);
+    } catch (e) {
+      err.hidden = false; err.textContent = "Your team check wasn't created. Check your connection and try again.";
+      btn.disabled = false; btn.textContent = "Create my team check";
+    }
+  });
+}
+
+function slider(id, label, lo, hi) {
+  return `<div class="slider">
+    <div class="top"><label for="${id}">${esc(label)}</label><output id="${id}-o" for="${id}">3.0</output></div>
+    <input type="range" id="${id}" min="1" max="5" step="0.5" value="3">
+    <div class="ends"><span>${esc(lo)}</span><span>${esc(hi)}</span></div>
+  </div>`;
+}
+
+function viewCreated(code, key, name) {
+  const sLink = surveyLink(code), rLink = resultsLink(code, key);
+  const msg = `Hi team,
+
+I'm taking part in a leadership programme and I'd value your honest view of how our team works. It's 8 quick statements, about two minutes, and it's anonymous: I'll only see the combined results once at least 4 of you have responded, and I'll never see who said what.
+
+I'll share what comes back with you.
+
+${sLink}
+
+Thank you.`;
+  const mail = "mailto:?subject=" + encodeURIComponent("In the Zone: " + name) +
+    "&body=" + encodeURIComponent("My private results link (don't share):\n" + rLink + "\n\nSurvey link for my team:\n" + sLink);
+  render(`
+  <div class="reveal">
+    <h1 class="page">Your team check is ready</h1>
+    <p class="lede">${esc(name)}</p>
+  </div>
+  <div class="panel">
+    <h2>Save your private results link</h2>
+    <p>This is the only way back to your results. It isn't shown again, and anyone with it can see your team's results.</p>
+    <div class="linkbox"><code>${esc(rLink)}</code><button class="btn small secondary" data-copy="${esc(rLink)}">Copy</button></div>
+    <div class="actions"><a class="btn secondary small" href="${esc(mail)}">Email both links to myself</a></div>
+  </div>
+  <div class="panel">
+    <h2>Send this to your team</h2>
+    <p>Share the survey link with everyone in your team. You can edit the message before you send it.</p>
+    <div class="linkbox"><code>${esc(sLink)}</code><button class="btn small secondary" data-copy="${esc(sLink)}">Copy</button></div>
+    <label class="field" for="msg" style="margin-top:16px">Message for your team</label>
+    <textarea id="msg">${esc(msg)}</textarea>
+    <div class="actions"><button class="btn small secondary" id="copymsg">Copy message</button></div>
+  </div>
+  <div class="actions"><button class="btn" id="openres">Open my results</button></div>`);
+  bindCopies();
+  $("#copymsg").addEventListener("click", e => copyText($("#msg").value, e.currentTarget));
+  $("#openres").addEventListener("click", () => go("t=" + encodeURIComponent(code) + "&k=" + encodeURIComponent(key)));
+}
+
+function bindCopies() {
+  document.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", e => copyText(b.getAttribute("data-copy"), e.currentTarget)));
+}
+
+/* ---------- views: survey ---------- */
+async function viewSurvey(code) {
+  code = code.toUpperCase();
+  render(`<div class="spinner">Loading the team check</div>`);
+  let team;
+  try { team = await api("getTeam", { code }); } catch (e) { return fail("The team check didn't load. Check your connection and try again."); }
+  if (!team.ok) return render(`<div class="panel reveal"><h1 class="page">This link isn't working</h1><p>Check you've copied the whole link from your leader's message, or ask them to send it again.</p></div>`);
+  document.title = "Team check: " + team.name;
+  if (store.get("itz_done_" + code) && !params.has("again")) {
+    return render(`<div class="panel reveal"><h1 class="page">You've already responded</h1><p>Your answers for ${esc(team.name)} were submitted from this device. Thank you.</p>
+      <p class="small muted">Sharing this device with a colleague? <a href="#" id="again">Respond as a different person</a>.</p></div>`),
+      $("#again").addEventListener("click", ev => { ev.preventDefault(); go("t=" + code + "&again=1"); });
+  }
+  render(`
+  <div class="reveal">
+    <p class="muted" style="margin:0 0 4px">Team check for</p>
+    <h1 class="page">${esc(team.name)}</h1>
+    <p class="lede">8 statements about how this team works. Answer for how things are, not how they should be. It takes about two minutes.</p>
+  </div>
+  <div class="note">
+    <p style="margin:0 0 8px"><b>Your answers are anonymous.</b> Your leader only sees combined results once at least 4 people have responded, and never sees who said what. Results show each person as an unlabelled dot, so in a small team, bear that in mind.</p>
+    <p style="margin:0">We store only your 8 answers and the time you submitted. No names, emails or device details.</p>
+  </div>
+  <form id="survey" class="panel" novalidate>
+    ${QUESTIONS.map((q, i) => `
+    <fieldset class="q" id="q${i}" style="border:0;margin:0;padding-left:0;padding-right:0">
+      <legend class="qtext" style="padding:0"><span class="qnum">${i + 1}</span><span>${esc(q.text)}</span></legend>
+      <div class="scale">
+        ${[1, 2, 3, 4, 5].map(v => `<label><input type="radio" name="a${i}" value="${v}" aria-label="${v}: ${["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"][v - 1]}"><span>${v}</span></label>`).join("")}
+      </div>
+      <div class="scale-ends"><span>Strongly disagree</span><span>Strongly agree</span></div>
+    </fieldset>`).join("")}
+    <p class="error" id="serr" hidden></p>
+    <div class="actions"><button class="btn" type="submit" id="sbtn">Submit my answers</button></div>
+  </form>`);
+  $("#survey").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const answers = QUESTIONS.map((q, i) => { const c = document.querySelector(`input[name=a${i}]:checked`); return c ? +c.value : null; });
+    const missing = answers.map((a, i) => a === null ? i + 1 : null).filter(Boolean);
+    document.querySelectorAll(".q").forEach((el, i) => el.classList.toggle("missing", answers[i] === null));
+    const err = $("#serr");
+    if (missing.length) {
+      err.hidden = false;
+      err.textContent = "Answer all 8 statements to submit. Still to answer: " + missing.join(", ") + ".";
+      $("#q" + (missing[0] - 1)).scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    err.hidden = true;
+    const btn = $("#sbtn"); btn.disabled = true; btn.textContent = "Submitting";
+    try {
+      const res = await api("submit", { code, answers });
+      if (!res.ok) throw new Error(res.error);
+      store.set("itz_done_" + code, "1");
+      render(`<div class="panel reveal center"><h1 class="page">Thank you</h1><p>Your answers for ${esc(team.name)} are in.</p><p class="muted">Your leader will share what the team said once enough people have responded.</p></div>`);
+      window.scrollTo(0, 0);
+    } catch (e) {
+      err.hidden = false; err.textContent = "Your answers weren't submitted. Check your connection and try again.";
+      btn.disabled = false; btn.textContent = "Submit my answers";
+    }
+  });
+}
+
+/* ---------- views: results ---------- */
+async function viewResults(code, key) {
+  code = code.toUpperCase();
+  render(`<div class="spinner">Loading your results</div>`);
+  let r;
+  try { r = await api("results", { code, key }); } catch (e) { return fail("Your results didn't load. Check your connection and try again."); }
+  if (!r.ok) return render(`<div class="panel reveal"><h1 class="page">This results link isn't working</h1><p>Check you've copied the whole link. If you've lost it, ask your programme facilitator to resend it.</p></div>`);
+  document.title = "Results: " + r.name;
+  const sLink = surveyLink(code);
+  const head = `<div class="reveal"><p class="muted" style="margin:0 0 4px">${esc(r.level)} team, ${r.n} ${r.n === 1 ? "response" : "responses"}</p><h1 class="page">${esc(r.name)}</h1></div>`;
+  const collect = `<div class="panel"><h3>Keep collecting</h3><p class="small muted">Results update as more people respond. Share the survey link again if needed.</p>
+    <div class="linkbox"><code>${esc(sLink)}</code><button class="btn small secondary" data-copy="${esc(sLink)}">Copy</button></div>
+    <div class="actions"><button class="btn small secondary" id="refresh">Refresh results</button></div></div>`;
+
+  if (r.locked) {
+    const pct = Math.min(100, Math.round(r.n / r.min * 100));
+    render(`${head}
+      <div class="panel">
+        <h2>${r.n} of ${r.min} responses so far</h2>
+        <div class="progress" role="progressbar" aria-valuenow="${r.n}" aria-valuemin="0" aria-valuemax="${r.min}"><div style="width:${pct}%"></div></div>
+        <p>Results unlock once ${r.min} people have responded. This protects everyone's anonymity.</p>
+      </div>
+      <div class="panel"><h3>Your prediction</h3><div class="chart" style="max-width:320px">${chart(Object.assign({}, EDM, { pred: { x: r.prediction.accountability, y: r.prediction.safety }, aria: "Your prediction" }))}</div>${legend([["pred", "Your prediction"]])}</div>
+      ${collect}`);
+    bindCopies();
+    $("#refresh").addEventListener("click", () => viewResults(code, key));
+    return;
+  }
+
+  const a = r.averages, p = r.prediction;
+  const z = zoneOf(a.safety, a.accountability), Z = ZONES[z];
+  const near = nearLine(a.safety, a.accountability);
+  const gapRow = (label, pv, av) => {
+    const d = av - pv;
+    const say = Math.abs(d) < 0.25 ? "As expected" : (d < 0 ? "Lower than expected" : "Higher than expected");
+    return `<tr><th>${label}</th><td class="num">${fmt(pv)}</td><td class="num">${fmt(av)}</td><td>${say}</td></tr>`;
+  };
+  const groups = ["safety", "power", "accountability"];
+  const bars = groups.map(dim => `<p class="group-h">${DIMS[dim]}</p>` + QUESTIONS.map((q, i) => q.dim !== dim ? "" : `
+      <div class="bar"><div class="lbl"><span>${esc(q.short)}: <span class="muted">${esc(q.text)}</span></span><b>${fmt(r.itemAverages[i])}</b></div>
+      <div class="track"><div class="fill" style="width:${(r.itemAverages[i] - 1) / 4 * 100}%"></div></div></div>`).join("")).join("");
+  const lowAcc = QUESTIONS.map((q, i) => ({ q, v: r.itemAverages[i] })).filter(o => o.q.dim === "accountability").sort((m, n) => m.v - n.v)[0];
+
+  render(`${head}
+  <div class="zone-hero reveal" style="background:${Z.color}">
+    <div class="k">Your team reads as</div>
+    <h2>${Z.name}</h2>
+    <p>${near ? "It sits close to the line, so treat this as a direction rather than a verdict. " : ""}${esc(Z.text)}</p>
+  </div>
+
+  <section class="panel">
+    <h2>Where your team sits</h2>
+    <p class="muted small">Psychological safety against accountability, after Amy Edmondson. The filled dot is your team's average. The ring is your prediction.</p>
+    <div class="chart">${chart(Object.assign({}, EDM, { avg: { x: a.accountability, y: a.safety }, pred: { x: p.accountability, y: p.safety }, avgColor: Z.color, aria: "Team average on the zones graph" }))}</div>
+    ${legend([["avg", "Team average"], ["pred", "Your prediction"]])}
+    <table class="gap-table">
+      <thead><tr><th></th><th>You predicted</th><th>Team says</th><th></th></tr></thead>
+      <tbody>${gapRow("Safety", p.safety, a.safety)}${gapRow("Influence", p.power, a.power)}${gapRow("Accountability", p.accountability, a.accountability)}</tbody>
+    </table>
+    <p class="small muted" style="margin-top:10px">Scores run from 1 to 5. The dashed lines sit at 3.</p>
+  </section>
+
+  <section class="panel">
+    <h2>Who sits where</h2>
+    <p class="muted small">Each dot is one person, placed by how safe they feel and how much influence they have. Look for anyone away from the cluster, especially towards the bottom left. The average hides them.</p>
+    <div class="chart">${chart(Object.assign({}, PWR, { dots: r.points.map(pt => ({ x: pt.power, y: pt.safety })), avg: { x: a.power, y: a.safety }, pred: { x: p.power, y: p.safety }, avgColor: Z.color, aria: "Each person by power and safety" }))}</div>
+    ${legend([["dot", "One person"], ["avg", "Team average"], ["pred", "Your prediction"]])}
+  </section>
+
+  <section class="panel">
+    <h2>Statement by statement</h2>
+    <p class="muted small">Average score for each statement, from 1 (strongly disagree) to 5 (strongly agree). Lowest accountability statement: <b>${esc(lowAcc.q.short)}</b>.</p>
+    <div class="bars">${bars}</div>
+  </section>
+
+  <section class="panel">
+    <h2>Reflect before you talk to your team</h2>
+    <ol class="qs">${REFLECT.map(q => `<li>${esc(q)}</li>`).join("")}</ol>
+  </section>
+
+  <section class="panel">
+    <h2>Take it back to your team</h2>
+    <p>Share what came back, then ask:</p>
+    <ol class="qs">${TEAM_QS.map(q => `<li>${esc(q)}</li>`).join("")}</ol>
+    <p class="small muted" style="margin-top:12px">Sharing results back shows your team their answers went somewhere. Skip it, and fewer people will answer next time.</p>
+  </section>
+  ${collect}`);
+  bindCopies();
+  $("#refresh").addEventListener("click", () => viewResults(code, key));
+}
+
+/* ---------- views: admin ---------- */
+let adminPw = "";
+function viewAdmin() {
+  document.title = "In the Zone: admin";
+  if (!adminPw) {
+    render(`<form id="login" class="panel reveal" style="max-width:420px">
+      <h1 class="page">Programme view</h1>
+      <label class="field" for="pw">Admin password</label>
+      <input type="password" id="pw" autocomplete="current-password">
+      ${DEMO ? `<p class="hint" style="margin-top:8px">Demo password: demo</p>` : ""}
+      <p class="error" id="aerr" hidden></p>
+      <div class="actions"><button class="btn" type="submit">Open programme view</button></div>
+    </form>`);
+    $("#login").addEventListener("submit", async ev => {
+      ev.preventDefault();
+      adminPw = $("#pw").value;
+      const ok = await loadAdmin();
+      if (!ok) { adminPw = ""; const e = $("#aerr"); if (e) { e.hidden = false; e.textContent = "That password isn't right."; } }
+    });
+    return;
+  }
+  loadAdmin();
+}
+
+async function loadAdmin() {
+  let d;
+  try { d = await api("admin", { password: adminPw }); } catch (e) { fail("The programme view didn't load. Check your connection and try again."); return true; }
+  if (!d.ok) return false;
+  const unlocked = d.teams.filter(t => t.averages);
+  const counts = { learning: 0, comfort: 0, anxiety: 0, apathy: 0 };
+  unlocked.forEach(t => counts[zoneOf(t.averages.safety, t.averages.accountability)]++);
+  const totalResp = d.teams.reduce((s, t) => s + t.n, 0);
+  const rows = d.teams.slice().sort((m, n) => (n.n - m.n)).map(t => {
+    const av = t.averages, zk = av && zoneOf(av.safety, av.accountability);
+    return `<tr><td>${esc(t.name)}</td><td>${esc(t.level)}</td><td>${t.n}</td>
+      <td>${av ? fmt(av.safety) : ""}</td><td>${av ? fmt(av.power) : ""}</td><td>${av ? fmt(av.accountability) : ""}</td>
+      <td>${av ? `<span class="dot" style="background:${ZONES[zk].color}"></span> ${ZONES[zk].name.replace(" zone", "")}` : `<span class="muted">Waiting (${t.n}/${d.min})</span>`}</td>
+      <td><button class="btn small secondary" data-copy="${esc(resultsLink(t.code, t.key))}">Copy results link</button></td></tr>`;
+  }).join("");
+  const cohortBars = d.cohortItems ? ["safety", "power", "accountability"].map(dim => `<p class="group-h">${DIMS[dim]}</p>` + QUESTIONS.map((q, i) => q.dim !== dim ? "" : `
+      <div class="bar"><div class="lbl"><span>${esc(q.short)}</span><b>${fmt(d.cohortItems[i])}</b></div>
+      <div class="track"><div class="fill" style="width:${(d.cohortItems[i] - 1) / 4 * 100}%"></div></div></div>`).join("")).join("") : `<p class="muted">No team has reached ${d.min} responses yet.</p>`;
+
+  render(`
+  <div class="reveal"><h1 class="page">Programme view</h1><p class="lede">All teams across the cohort. Teams appear on the graph once they reach ${d.min} responses.</p></div>
+  <div class="stats">
+    <div class="stat"><b>${d.teams.length}</b><span>teams created</span></div>
+    <div class="stat"><b>${unlocked.length}</b><span>teams with results</span></div>
+    <div class="stat"><b>${totalResp}</b><span>responses</span></div>
+  </div>
+  <section class="panel">
+    <h2>Teams by zone</h2>
+    <p class="small muted">Learning ${counts.learning}, comfort ${counts.comfort}, anxiety ${counts.anxiety}, apathy ${counts.apathy}.</p>
+    <label class="toggle"><input type="checkbox" id="lbls"> Show team names</label>
+    <div class="chart" id="achart"></div>
+    ${legend([["w2", "W2 team"], ["w3", "W3 team"], ["avg", "Cohort average"]])}
+  </section>
+  <section class="panel">
+    <h2>Cohort, statement by statement</h2>
+    <p class="small muted">Averages across all responses from teams with results (${d.cohortN} responses).</p>
+    ${cohortBars}
+  </section>
+  <section class="panel">
+    <h2>All teams</h2>
+    <div class="tablewrap"><table class="teams">
+      <thead><tr><th>Team</th><th>Level</th><th>Responses</th><th>Safety</th><th>Influence</th><th>Accountability</th><th>Zone</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="8" class="muted">No teams yet. Share the start page with leaders to begin.</td></tr>`}</tbody>
+    </table></div>
+    <div class="actions"><button class="btn small secondary" id="csv">Download summary (CSV)</button><button class="btn small secondary" id="reload">Refresh</button></div>
+  </section>`);
+  const draw = () => {
+    $("#achart").innerHTML = chart(Object.assign({}, EDM, {
+      teams: unlocked.map(t => ({ x: t.averages.accountability, y: t.averages.safety, level: t.level, label: t.name })),
+      showLabels: $("#lbls").checked,
+      avg: d.cohort ? { x: d.cohort.accountability, y: d.cohort.safety } : null,
+      avgColor: "var(--learning)", aria: "All teams on the zones graph"
+    }));
+  };
+  $("#lbls").addEventListener("change", draw);
+  draw();
+  bindCopies();
+  $("#reload").addEventListener("click", () => loadAdmin());
+  $("#csv").addEventListener("click", () => {
+    const head = ["team", "level", "responses", "safety", "influence", "accountability", "zone", "pred_safety", "pred_influence", "pred_accountability"];
+    const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+    const lines = [head.join(",")].concat(d.teams.map(t => {
+      const av = t.averages;
+      return [t.name, t.level, t.n, av && av.safety, av && av.power, av && av.accountability,
+        av ? ZONES[zoneOf(av.safety, av.accountability)].name : "", t.prediction && t.prediction.safety, t.prediction && t.prediction.power, t.prediction && t.prediction.accountability].map(q).join(",");
+    }));
+    const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" }));
+    const aEl = document.createElement("a"); aEl.href = url; aEl.download = "in-the-zone-summary.csv";
+    document.body.appendChild(aEl); aEl.click(); aEl.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  return true;
+}
+
+/* ---------- boot ---------- */
+$("#partner").textContent = CONFIG.PARTNER;
+if (DEMO) {
+  $("#demo").innerHTML = `<div class="demo">Demo mode: nothing is saved. Try
+    <button data-go="">Start page</button><button data-go="t=DEMO01">Team survey</button><button data-go="t=DEMO01&k=demo">Results</button><button data-go="t=DEMO03&k=demo3">Locked results</button><button data-go="admin=1">Programme view</button></div>`;
+  document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.getAttribute("data-go"))));
+}
+route();
+</script>
+</body>
+</html>

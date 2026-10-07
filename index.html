@@ -118,6 +118,15 @@ input[type=text], input[type=password] {
 }
 input[type=text]:focus, input[type=password]:focus { border-color: var(--ink); outline: none; box-shadow: inset 0 0 0 1px var(--ink); }
 :focus-visible { outline: 2px solid var(--learning); outline-offset: 2px; }
+.picks { display: grid; gap: 6px; }
+@media (min-width: 560px) { .picks { grid-template-columns: 1fr 1fr; } }
+.pick { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--line-strong); padding: 11px 12px; cursor: pointer; }
+.pick input { margin: 3px 0 0; accent-color: var(--ink); width: 16px; height: 16px; flex: none; }
+.pick b { display: block; font-weight: 600; font-size: 15px; line-height: 1.3; }
+.pick small { display: block; font-size: 12.5px; color: var(--ink-soft); line-height: 1.35; }
+.pick:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.pick:has(input:focus-visible) { outline: 2px solid var(--learning); outline-offset: 2px; }
+details.legacy summary { cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 15px; }
 .seg { display: inline-flex; border: 1px solid var(--line-strong); }
 .seg label {
   min-width: 76px; text-align: center; cursor: pointer; padding: 9px 16px;
@@ -223,7 +232,7 @@ footer { padding: 20px 0 40px; font-size: 12px; color: var(--page-soft); border-
   <div class="brandbar"><span><b>Run to the Monster</b> in partnership with <b id="partner">WFS</b></span></div>
   <div id="demo"></div>
   <main id="app" aria-live="polite"><div class="spinner">Loading</div></main>
-  <footer>In the Zone is a Run to the Monster tool. Team check responses are anonymous.</footer>
+  <footer>In the Zone is a Run to the Monster tool. Responses are anonymous and only ever shown for a whole area.</footer>
 </div>
 <script>
 /* ======================================================================
@@ -238,6 +247,20 @@ const CONFIG = {
   // Partner name shown in the header
   PARTNER: "WFS"
 };
+
+/* The areas people choose from. The ids must match AREAS in Code.gs. */
+const AREAS = [
+  { id: "credit-risk", name: "Credit Risk", sub: "Credit Risk Officer's area" },
+  { id: "sales-distribution", name: "Sales & Distribution", sub: "Sales & Distribution Executive's area" },
+  { id: "information-technology", name: "Information Technology", sub: "Chief Information Officer's area" },
+  { id: "commercial-product", name: "Commercial & Product", sub: "Commercial & Product Executive's area" },
+  { id: "finance", name: "Finance", sub: "Chief Financial Officer's area" },
+  { id: "customer-operations", name: "Customer Operations", sub: "Customer Operations Executive's area" },
+  { id: "customer", name: "Customer", sub: "Chief Customer Officer's area" },
+  { id: "people-culture", name: "People & Culture", sub: "Chief P&C Officer's area" }
+];
+const AREA_MIN = 6;   // matches AREA_MIN_RESPONSES in Code.gs
+const SPLIT_MIN = 4;  // matches SPLIT_MIN in Code.gs
 
 /* ====================================================================== */
 
@@ -367,8 +390,34 @@ const MOCK = {
     DEMO04: { key: "demo4", name: "Card Operations", level: "W2", prediction: predFromItems([5,4,4,4,4,4,4,4]),
       responses: [[4,4,3,4,2,2,3,3],[5,4,4,4,3,2,2,3],[4,5,3,3,2,2,2,2],[4,4,4,4,3,2,3,3],[5,5,4,4,2,3,2,3]] }
   },
-  created: {}
+  areaMin: 6, splitMin: 4,
+  areaResponses: [
+    ...[[5,4,4,4,4,4,4,4],[4,4,4,5,4,3,4,4],[4,5,4,4,5,4,4,3],[4,4,3,4,4,4,3,4],[5,4,5,4,4,4,4,4],[4,3,4,4,4,3,4,3]].map(a => ({ area: "credit-risk", group: "leader", a })),
+    ...[[3,2,2,2,4,3,3,2],[2,2,2,1,4,4,3,2],[4,3,3,3,4,3,3,3],[3,3,2,2,3,3,2,2],[2,1,1,2,4,3,2,1],[4,4,3,3,4,4,4,3],[3,2,2,3,3,3,3,2],[2,2,2,2,4,4,3,2]].map(a => ({ area: "credit-risk", group: "other", a })),
+    ...[[4,4,3,3,3,3,3,3],[3,3,3,3,4,3,3,3],[4,3,3,4,3,3,4,3]].map(a => ({ area: "finance", group: "other", a })),
+    ...[[4,4,4,4,3,2,3,3],[5,4,4,4,2,2,3,3],[4,5,3,4,3,2,2,3]].map(a => ({ area: "customer", group: "leader", a })),
+    ...[[4,4,3,3,2,3,2,3],[5,4,4,4,3,2,3,2],[4,4,3,3,2,2,3,3],[4,5,4,3,3,3,2,3],[3,4,3,3,2,2,2,2]].map(a => ({ area: "customer", group: "other", a }))
+  ],
+  areaLeaders: {
+    demoarea: { area: "credit-risk", level: "W2", items: [4,4,4,4,4,4,4,5] },
+    demolocked: { area: "finance", level: "W3", items: [4,4,3,4,4,3,4,4] },
+    demonosplit: { area: "customer", level: "W2", items: [4,4,4,4,4,3,4,4] }
+  }
 };
+
+function mockAreaSummary(area) {
+  const mine = MOCK.areaResponses.filter(r => r.area === area);
+  const leaders = mine.filter(r => r.group === "leader").map(r => r.a), others = mine.filter(r => r.group !== "leader").map(r => r.a);
+  const all = leaders.concat(others);
+  const out = { area, n: all.length, min: MOCK.areaMin, locked: all.length < MOCK.areaMin, split: null };
+  if (out.locked) return out;
+  Object.assign(out, summarise(all));
+  if (leaders.length >= MOCK.splitMin && others.length >= MOCK.splitMin) {
+    const a = summarise(leaders), b = summarise(others);
+    out.split = { leaders: { n: leaders.length, averages: a.averages, itemAverages: a.itemAverages }, others: { n: others.length, averages: b.averages, itemAverages: b.itemAverages } };
+  }
+  return out;
+}
 
 const mock = {
   createTeam(p) {
@@ -397,6 +446,20 @@ const mock = {
     if (!out.locked) Object.assign(out, summarise(t.responses));
     return out;
   },
+  areaSubmit(p) {
+    const lead = p.level === "W2" || p.level === "W3";
+    if (!AREAS.some(a => a.id === p.area) || !["W2", "W3", "Other"].includes(p.level) || !validAnswers(p.answers) || (lead && !validAnswers(p.predItems))) return { ok: false, error: "invalid" };
+    MOCK.areaResponses.push({ area: p.area, group: lead ? "leader" : "other", a: p.answers.slice() });
+    if (!lead) return { ok: true };
+    const key = "k" + Math.random().toString(36).slice(2, 14);
+    MOCK.areaLeaders[key] = { area: p.area, level: p.level, items: p.predItems.slice() };
+    return { ok: true, key };
+  },
+  areaResults(p) {
+    const L = MOCK.areaLeaders[p.key];
+    if (!L) return { ok: false, error: "not_found" };
+    return Object.assign(mockAreaSummary(L.area), { ok: true, level: L.level, prediction: predFromItems(L.items) });
+  },
   admin(p) {
     if (p.password !== MOCK.password) return { ok: false, error: "denied" };
     const all = [];
@@ -406,7 +469,10 @@ const mock = {
       return { code, key: t.key, name: t.name, level: t.level, n: t.responses.length, prediction: t.prediction, averages: unlocked ? summarise(t.responses).averages : null };
     });
     const s = all.length ? summarise(all) : null;
-    return { ok: true, min: MOCK.min, teams, cohort: s && s.averages, cohortItems: s && s.itemAverages, cohortN: all.length };
+    const areas = AREAS.map(a => { const m = mockAreaSummary(a.id); return { area: a.id, n: m.n, leaders: Object.values(MOCK.areaLeaders).filter(l => l.area === a.id).length, averages: m.locked ? null : m.averages, split: m.split }; });
+    const pooled = MOCK.areaResponses.map(r => r.a), ps = pooled.length >= MOCK.areaMin ? summarise(pooled) : null;
+    return { ok: true, min: MOCK.min, areaMin: MOCK.areaMin, areas, areaTotal: pooled.length, areaCohort: ps && ps.averages, areaCohortItems: ps && ps.itemAverages,
+      teams, cohort: s && s.averages, cohortItems: s && s.itemAverages, cohortN: all.length };
   }
 };
 
@@ -438,7 +504,8 @@ function route() {
   const t = params.get("t"), k = params.get("k");
   if (t && k) return viewResults(t, k);
   if (t) return viewSurvey(t);
-  return viewStart();
+  if (params.get("r")) return viewAreaResults(params.get("r"));
+  return viewAreaStart();
 }
 const app = () => $("#app");
 function render(html) { app().innerHTML = html; }
@@ -496,6 +563,16 @@ function chart(o) {
       }
     });
   }
+  // group averages (W2 and W3 against everyone else)
+  if (o.marks && o.marks.length === 2) {
+    const m0 = o.marks[0], m1 = o.marks[1];
+    g += `<line x1="${x(m0.x)}" y1="${y(m0.y)}" x2="${x(m1.x)}" y2="${y(m1.y)}" stroke="var(--ink)" stroke-width="2" stroke-dasharray="2 4"/>`;
+    o.marks.forEach(m => {
+      const cx = x(m.x), cy = y(m.y);
+      if (m.kind === "lead") g += `<path d="M${cx} ${cy - 12}L${cx + 12} ${cy}L${cx} ${cy + 12}L${cx - 12} ${cy}Z" fill="var(--ink)" stroke="var(--surface)" stroke-width="2.5"/>`;
+      else g += `<circle cx="${cx}" cy="${cy}" r="10" fill="var(--surface)" stroke="var(--ink)" stroke-width="4"/>`;
+    });
+  }
   if (o.pred && o.avg) {
     g += `<line x1="${x(o.pred.x)}" y1="${y(o.pred.y)}" x2="${x(o.avg.x)}" y2="${y(o.avg.y)}" stroke="var(--ink)" stroke-width="2" stroke-dasharray="2 4"/>`;
   }
@@ -520,6 +597,8 @@ function legend(items) {
     avg: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="var(--learning)"/></svg>`,
     pred: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--ink)" stroke-width="2.5"/></svg>`,
     dot: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="var(--ink)" fill-opacity=".72"/></svg>`,
+    lead: `<svg width="16" height="16" aria-hidden="true"><path d="M8 1L15 8L8 15L1 8Z" fill="var(--ink)"/></svg>`,
+    oth: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="5.5" fill="none" stroke="var(--ink)" stroke-width="3"/></svg>`,
     w2: `<svg width="16" height="16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="var(--ink)"/></svg>`,
     w3: `<svg width="16" height="16" aria-hidden="true"><rect x="2" y="2" width="12" height="12" rx="2" fill="var(--ink)"/></svg>`
   };
@@ -529,85 +608,248 @@ function legend(items) {
 const EDM = { xLow: "Low", xHigh: "High", xTitle: "Standards", yLow: "Low", yHigh: "High", yTitle: "Psychological safety", zones: true };
 const PWR = { xLow: "Less power", xHigh: "More power", xTitle: "Influence", yLow: "Unsafe", yHigh: "Safe", yTitle: "Safety" };
 
-/* ---------- views: start ---------- */
-function viewStart() {
+/* ---------- views: area check (start) ---------- */
+const areaName = id => (AREAS.find(a => a.id === id) || { name: "Your area" }).name;
+const areaResultsLink = key => baseUrl() + "?r=" + encodeURIComponent(key);
+const pickedIn = (form, prefix) => QUESTIONS.map((q, i) => { const c = form.querySelector(`input[name=${prefix}${i}]:checked`); return c ? +c.value : null; });
+
+function viewAreaStart() {
   document.title = "In the Zone";
+  const savedKey = store.get("itz_area_key");
+  if (store.get("itz_area_done") && !params.has("again")) {
+    render(`<div class="reveal"><div class="wordmark">In the Zone</div></div>
+      <div class="panel"><h2>You've already responded</h2><p>Your answers were submitted from this device. Thank you.</p>
+      ${savedKey ? `<div class="actions"><button class="btn" id="openmine">Open my area's results</button></div>` : ""}
+      <p class="small muted" style="margin-top:16px">Sharing this device with a colleague? <a href="#" id="again">Respond as a different person</a>.</p></div>`);
+    if (savedKey) $("#openmine").addEventListener("click", () => go("r=" + encodeURIComponent(savedKey)));
+    $("#again").addEventListener("click", ev => { ev.preventDefault(); go("again=1"); });
+    return;
+  }
   render(`
   <div class="reveal">
     <div class="wordmark">In the Zone</div>
-    <p class="lede">A two-minute anonymous team check. It shows how safe your people feel, how much influence they have, and how high the bar is, so you can see which zone your team is really in.</p>
+    <p class="lede">A short, anonymous check on how safe people feel, how much influence they have, and how high the bar is in the teams across your area.</p>
   </div>
-  <section>
-    <h2>How it works</h2>
-    <ol class="steps">
-      <li><b>Create your team check.</b> Name your team and predict where it sits.</li>
-      <li><b>Send the survey link to your team.</b> It's 8 statements, and answers are anonymous.</li>
-      <li><b>Open your results once 4 people have responded.</b> Compare what your team reports with your prediction.</li>
-    </ol>
-  </section>
-  <section>
-    <form id="create" class="panel" novalidate>
-      <h2>Create your team check</h2>
-      <label class="field" for="tname">Your team's name</label>
-      <p class="hint">Use a name your team will recognise. It appears at the top of their survey.</p>
-      <input type="text" id="tname" maxlength="60" autocomplete="off" placeholder="For example, Credit Risk Analytics">
-      <div style="margin-top:20px">
-        <span class="field" id="lvl-l" style="display:block;font-weight:700;margin-bottom:8px">Your level</span>
-        <div class="seg" role="radiogroup" aria-labelledby="lvl-l">
-          ${["W2", "W3", "Other"].map(l => `<label><input type="radio" name="level" value="${l}"><span>${l}</span></label>`).join("")}
-        </div>
+  <div class="note">
+    <p style="margin:0 0 8px"><b>Your answers are anonymous.</b> Results are only ever shown for a whole area, and only once at least ${AREA_MIN} people in it have responded. Nobody sees results for a single team, and nobody sees who said what.</p>
+    <p style="margin:0">We store only your area, whether you are a W2 or W3, your 8 answers and the date. No names, emails or device details.</p>
+  </div>
+  <form id="af" class="panel" novalidate>
+    <h2>About you</h2>
+    <span class="field" id="area-l">Which area do you work in?</span>
+    <div class="picks" role="radiogroup" aria-labelledby="area-l">
+      ${AREAS.map(a => `<label class="pick"><input type="radio" name="area" value="${a.id}"><span><b>${esc(a.name)}</b><small>${esc(a.sub)}</small></span></label>`).join("")}
+    </div>
+    <div style="margin-top:22px">
+      <span class="field" id="lvl-l">Your level</span>
+      <div class="seg" role="radiogroup" aria-labelledby="lvl-l">
+        <label><input type="radio" name="level" value="W2"><span>W2</span></label>
+        <label><input type="radio" name="level" value="W3"><span>W3</span></label>
+        <label><input type="radio" name="level" value="Other"><span>Neither</span></label>
       </div>
-      <div style="margin-top:32px">
-        <h3>How do you think your team would rate these statements?</h3>
-        <p class="hint" style="margin-bottom:22px">Answer as you think your team would, on average. Think about everyone, including the quieter voices, not just the people you hear from most. The gap between your prediction and their answers is the most useful part of your results.</p>
-        ${QUESTIONS.map((q, i) => scaleQ("p" + i, i, q.lead)).join("")}
-        <div class="callout" style="margin-top:8px">
-          <p class="small muted" style="margin:0 0 4px">Where your prediction places your team</p>
-          <div class="chart" id="predchart" aria-hidden="true"></div>
-        </div>
-      </div>
-      <p class="error" id="cerr" hidden></p>
-      <div class="actions"><button class="btn" type="submit" id="cbtn">Create my team check</button></div>
-    </form>
-  </section>`);
-  const picked = prefix => QUESTIONS.map((q, i) => { const c = document.querySelector(`input[name=${prefix}${i}]:checked`); return c ? +c.value : null; });
-  const draw = () => {
-    const v = picked("p");
-    const sa = [v[0], v[1]].filter(x => x !== null), ac = [v[4], v[5], v[6], v[7]].filter(x => x !== null);
-    const pred = sa.length && ac.length ? { x: mean(ac), y: mean(sa) } : null;
-    $("#predchart").innerHTML = chart(Object.assign({}, EDM, { pred, aria: "Your prediction on the zones graph" }));
-  };
-  $("#create").addEventListener("change", ev => {
-    if (ev.target.name && ev.target.name[0] === "p") { draw(); clearMissing(ev.target); }
+    </div>
+    <div style="margin-top:34px">
+      <h3>Your own experience</h3>
+      <p class="hint" style="margin-bottom:22px">Answer about the team you work in day to day. Answer for how things are, not how they should be.</p>
+      ${QUESTIONS.map((q, i) => scaleQ("a" + i, i, q.text)).join("")}
+    </div>
+    <div id="predwrap" hidden style="margin-top:34px">
+      <h3>Your prediction</h3>
+      <p class="hint" style="margin-bottom:22px">Now predict how people across your area will rate the same statements, on average, each thinking about their own team. Think about everyone, including the quieter voices, not just the people you hear from most. The gap between your prediction and their answers is the most useful part of your results.</p>
+      ${QUESTIONS.map((q, i) => scaleQ("p" + i, i, q.lead.replace("in this team", "in their team"))).join("")}
+    </div>
+    <p class="error" id="aferr" hidden></p>
+    <div class="actions"><button class="btn" type="submit" id="afbtn">Submit my answers</button></div>
+  </form>`);
+  const form = $("#af");
+  const level = () => { const c = form.querySelector("input[name=level]:checked"); return c ? c.value : null; };
+  form.addEventListener("change", ev => {
+    if (ev.target.name === "level") $("#predwrap").hidden = level() === "Other" || !level();
+    clearMissing(ev.target);
   });
-  draw();
-  $("#create").addEventListener("submit", async ev => {
+  form.addEventListener("submit", async ev => {
     ev.preventDefault();
-    const name = $("#tname").value.trim();
-    const lv = document.querySelector('input[name=level]:checked');
-    const items = picked("p");
-    const err = $("#cerr");
-    const fields = [];
-    if (!name) fields.push("your team's name");
+    const area = form.querySelector("input[name=area]:checked"), lv = level(), lead = lv && lv !== "Other";
+    const answers = pickedIn(form, "a"), pred = lead ? pickedIn(form, "p") : null;
+    const err = $("#aferr"), msgs = [], fields = [];
+    if (!area) fields.push("your area");
     if (!lv) fields.push("your level");
-    const gaps = items.map((a, i) => a === null ? i + 1 : null).filter(Boolean);
-    document.querySelectorAll("#create .q").forEach((el, i) => el.classList.toggle("missing", items[i] === null));
-    const msgs = [];
-    if (fields.length) msgs.push("Add " + fields.join(" and ") + ".");
-    if (gaps.length) msgs.push(gaps.length === 8 ? "Answer all 8 statements." : "Answer statement" + (gaps.length > 1 ? "s " + gaps.slice(0, -1).join(", ") + " and " + gaps[gaps.length - 1] : " " + gaps[0]) + ".");
-    if (msgs.length) { err.hidden = false; err.textContent = msgs.join(" "); return; }
+    if (fields.length) msgs.push("Choose " + fields.join(" and ") + ".");
+    QUESTIONS.forEach((q, i) => {
+      $("#a" + i + "-q").classList.toggle("missing", answers[i] === null);
+      if (lead) $("#p" + i + "-q").classList.toggle("missing", pred[i] === null);
+    });
+    const gapsA = answers.filter(v => v === null).length, gapsP = lead ? pred.filter(v => v === null).length : 0;
+    if (gapsA) msgs.push(gapsA === 8 ? "Answer the 8 statements about your own experience." : "Answer the " + gapsA + " remaining statement" + (gapsA > 1 ? "s" : "") + " about your own experience.");
+    if (gapsP) msgs.push(gapsP === 8 ? "Answer the 8 prediction statements." : "Answer the " + gapsP + " remaining prediction statement" + (gapsP > 1 ? "s" : "") + ".");
+    if (msgs.length) {
+      err.hidden = false; err.textContent = msgs.join(" ");
+      const first = form.querySelector(".q.missing"); if (first && !fields.length) first.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     err.hidden = true;
-    const btn = $("#cbtn"); btn.disabled = true; btn.textContent = "Creating";
+    const btn = $("#afbtn"); btn.disabled = true; btn.textContent = "Submitting";
     try {
-      const res = await api("createTeam", { name, level: lv.value, predItems: items });
+      const res = await api("areaSubmit", { area: area.value, level: lv, answers, predItems: pred });
       if (!res.ok) throw new Error(res.error);
-      viewCreated(res.code, res.key, name);
+      store.set("itz_area_done", "1");
+      if (res.key) { store.set("itz_area_key", res.key); viewAreaSaved(res.key, area.value); }
+      else render(`<div class="panel reveal center"><h1 class="page">Thank you</h1><p>Your answers for ${esc(areaName(area.value))} are in.</p><p class="muted">Results are only shown for the area as a whole.</p></div>`);
+      window.scrollTo(0, 0);
     } catch (e) {
       err.hidden = false;
-      err.textContent = "Your team check wasn't created. Check your connection and try again." + (e && e.message && e.message !== "network" ? " (" + e.message + ")" : "");
-      btn.disabled = false; btn.textContent = "Create my team check";
+      err.textContent = "Your answers weren't submitted. Check your connection and try again." + (e && e.message && e.message !== "network" ? " (" + e.message + ")" : "");
+      btn.disabled = false; btn.textContent = "Submit my answers";
     }
   });
+}
+
+function viewAreaSaved(key, area) {
+  const link = areaResultsLink(key), share = baseUrl();
+  const mail = "mailto:?subject=" + encodeURIComponent("In the Zone: my results link") + "&body=" + encodeURIComponent("My private results link (don't share):\n" + link);
+  const msg = `Hi team,
+
+As part of a leadership programme, I'd value your honest view of how our team works. It's 8 quick statements, about two minutes, and it's anonymous: results are only ever shown for our whole area, never for one team, so nobody can see how you answered, including me.
+
+Choose ${areaName(area)} as your area.
+
+${share}
+
+Thank you.`;
+  render(`
+  <div class="reveal"><h1 class="page">Your answers are in</h1><p class="lede">${esc(areaName(area))}</p></div>
+  <div class="panel">
+    <h2>Save your private results link</h2>
+    <p>This is your way back to your area's results and your prediction. It's saved on this device, but keep a copy in case you switch devices.</p>
+    <div class="linkbox"><code>${esc(link)}</code><button class="btn small secondary" data-copy="${esc(link)}">Copy</button></div>
+    <div class="actions"><a class="btn secondary small" href="${esc(mail)}">Email the link to myself</a></div>
+  </div>
+  <div class="panel">
+    <h2>Invite your team</h2>
+    <p>Send this to the people who report to you. Everyone uses the same link and chooses their area. No direct reports? Skip this step.</p>
+    <div class="linkbox"><code>${esc(share)}</code><button class="btn small secondary" data-copy="${esc(share)}">Copy</button></div>
+    <label class="field" for="msg" style="margin-top:16px">Message for your team</label>
+    <textarea id="msg">${esc(msg)}</textarea>
+    <div class="actions"><button class="btn small secondary" id="copymsg">Copy message</button></div>
+  </div>
+  <div class="actions"><button class="btn" id="openres">Open my area's results</button></div>`);
+  bindCopies();
+  $("#copymsg").addEventListener("click", e => copyText($("#msg").value, e.currentTarget));
+  $("#openres").addEventListener("click", () => go("r=" + encodeURIComponent(key)));
+}
+
+/* ---------- views: area results ---------- */
+async function viewAreaResults(key) {
+  render(`<div class="spinner">Loading your area's results</div>`);
+  let r;
+  try { r = await api("areaResults", { key }); } catch (e) { return fail("Your results didn't load. Check your connection and try again."); }
+  if (!r.ok) return render(`<div class="panel reveal"><h1 class="page">This results link isn't working</h1><p>Check you've copied the whole link. If you've lost it, you can respond again from the start page to get a new one.</p></div>`);
+  const name = areaName(r.area);
+  document.title = "Results: " + name;
+  const p = r.prediction;
+  const head = `<div class="reveal"><p class="muted" style="margin:0 0 4px">Area results, ${r.n} ${r.n === 1 ? "response" : "responses"}</p><h1 class="page">${esc(name)}</h1></div>`;
+  const foot = `<div class="panel"><h3>Keep collecting</h3><p class="small muted">Results update as more people in your area respond. Everyone uses the same link.</p>
+    <div class="linkbox"><code>${esc(baseUrl())}</code><button class="btn small secondary" data-copy="${esc(baseUrl())}">Copy</button></div>
+    <div class="actions"><button class="btn small secondary" id="refresh">Refresh results</button></div></div>`;
+  const done = () => { bindCopies(); $("#refresh").addEventListener("click", () => viewAreaResults(key)); };
+
+  if (r.locked) {
+    render(`${head}
+      <div class="panel"><h2>${r.n} of ${r.min} responses so far</h2>
+        <div class="progress" role="progressbar" aria-valuenow="${r.n}" aria-valuemin="0" aria-valuemax="${r.min}"><div style="width:${Math.min(100, Math.round(r.n / r.min * 100))}%"></div></div>
+        <p>Your area's results unlock once ${r.min} people have responded. This protects everyone's anonymity.</p></div>
+      <div class="panel"><h3>Your prediction</h3><div class="chart" style="max-width:320px">${chart(Object.assign({}, EDM, { pred: { x: p.accountability, y: p.safety }, aria: "Your prediction" }))}</div>${legend([["pred", "Your prediction"]])}</div>
+      ${foot}`);
+    return done();
+  }
+
+  const a = r.averages, sp = r.split, items = p.items;
+  const z = zoneOf(a.safety, a.accountability), Z = ZONES[z], near = nearLine(a.safety, a.accountability);
+  const gapRow = (label, pv, av) => {
+    const d = av - pv, say = Math.abs(d) < 0.25 ? "As expected" : (d < 0 ? "Lower than expected" : "Higher than expected");
+    return `<tr><th>${label}</th><td class="num">${fmt(pv)}</td><td class="num">${fmt(av)}</td><td>${say}</td></tr>`;
+  };
+  const bars = ["safety", "power", "accountability"].map(dim => `<p class="group-h">${DIMS[dim]}</p>` + QUESTIONS.map((q, i) => {
+    if (q.dim !== dim) return "";
+    const v = r.itemAverages[i], pv = items[i], d = v - pv;
+    const note = `You predicted ${pv}.${Math.abs(d) >= 0.75 ? (d < 0 ? " Your area rates this lower." : " Your area rates this higher.") : ""}`;
+    const split = sp ? `<div class="gapnote">W2 and W3: ${fmt(sp.leaders.itemAverages[i])}. Everyone else: ${fmt(sp.others.itemAverages[i])}.</div>` : "";
+    return `<div class="bar"><div class="lbl"><span>${esc(q.text)}</span><b>${fmt(v)}</b></div>
+      <div class="track"><div class="fill" style="width:${(v - 1) / 4 * 100}%"></div><span class="pm" style="left:${(pv - 1) / 4 * 100}%" title="Your prediction"></span></div><div class="gapnote">${note}</div>${split}</div>`;
+  }).join("")).join("");
+  const biggest = QUESTIONS.map((q, i) => ({ q, v: r.itemAverages[i], pv: items[i], d: r.itemAverages[i] - items[i] })).sort((m, n) => Math.abs(n.d) - Math.abs(m.d))[0];
+
+  let rank = `<section class="panel"><h2>The view by level</h2><p class="muted small">This compares W2s and W3s with everyone else. It appears once at least ${SPLIT_MIN} people in each group have responded, to keep both groups anonymous.</p></section>`;
+  if (sp) {
+    const L = sp.leaders, O = sp.others;
+    const row = (label, k) => { const d = L.averages[k] - O.averages[k]; return `<tr><th>${label}</th><td class="num">${fmt(L.averages[k])}</td><td class="num">${fmt(O.averages[k])}</td><td class="num">${d > 0 ? "+" : ""}${fmt(d)}</td></tr>`; };
+    const wide = QUESTIONS.map((q, i) => ({ q, d: L.itemAverages[i] - O.itemAverages[i] })).sort((m, n) => Math.abs(n.d) - Math.abs(m.d))[0];
+    rank = `<section class="panel">
+      <h2>The view by level</h2>
+      <p class="muted small">The same statements, answered by W2s and W3s (${L.n}) and by everyone else (${O.n}). A gap here is rank at work: the more senior you are, the safer and more influential a team tends to feel.</p>
+      <div class="chart">${chart(Object.assign({}, EDM, { marks: [{ x: L.averages.accountability, y: L.averages.safety, kind: "lead" }, { x: O.averages.accountability, y: O.averages.safety, kind: "oth" }], aria: "W2 and W3 average and everyone else's average on the zones graph" }))}</div>
+      ${legend([["lead", "W2 and W3"], ["oth", "Everyone else"]])}
+      <table class="gap-table"><thead><tr><th></th><th>W2 and W3</th><th>Everyone else</th><th>Gap</th></tr></thead>
+      <tbody>${row("Safety", "safety")}${row("Influence", "power")}${row("Standards", "accountability")}</tbody></table>
+      ${Math.abs(wide.d) >= 0.5 ? `<div class="callout"><b>Widest gap:</b> ${esc(wide.q.short.toLowerCase())}. W2s and W3s rate it ${fmt(Math.abs(wide.d))} ${wide.d > 0 ? "higher" : "lower"} than everyone else.</div>` : ""}
+    </section>`;
+  }
+  const reflect = [
+    "What surprised you, and what didn't?",
+    "Which zone is your area in? Is that where you predicted?",
+    sp ? "Where is the gap between W2s and W3s and everyone else widest? What might explain it?" : "Which statement scored lowest? What does that say about how your area works?",
+    "Who sits outside the cluster on the power and safety graph? What might they be carrying that you don't see?",
+    "What share of this picture is yours? What's one thing in your control that would move your own team one step towards the learning zone?"
+  ];
+
+  render(`${head}
+  <div class="zone-hero reveal" style="background:${Z.color}">
+    <div class="k">Your area reads as</div>
+    <h2>${Z.name}</h2>
+    <p>${near ? "It sits close to the line, so treat this as a direction rather than a verdict. " : ""}${esc(Z.text)}</p>
+  </div>
+  <section class="panel">
+    <h2>Where your area sits</h2>
+    <p class="muted small">Psychological safety against standards, after Amy Edmondson. Each person answered about their own team. The filled dot is the average across your area. The ring is your prediction.</p>
+    <div class="chart">${chart(Object.assign({}, EDM, { avg: { x: a.accountability, y: a.safety }, pred: { x: p.accountability, y: p.safety }, avgColor: Z.color, aria: "Area average on the zones graph" }))}</div>
+    ${legend([["avg", "Area average"], ["pred", "Your prediction"]])}
+    <table class="gap-table"><thead><tr><th></th><th>You predicted</th><th>Area says</th><th></th></tr></thead>
+    <tbody>${gapRow("Safety", p.safety, a.safety)}${gapRow("Influence", p.power, a.power)}${gapRow("Standards", p.accountability, a.accountability)}</tbody></table>
+    <p class="small muted" style="margin-top:10px">Scores run from 1 to 5. The dashed lines sit at 3.</p>
+  </section>
+  ${rank}
+  <section class="panel">
+    <h2>Who sits where</h2>
+    <p class="muted small">Each dot is one person in your area, placed by how safe they feel and how much influence they have. Look for anyone away from the cluster, especially towards the bottom left. The average hides them.</p>
+    <div class="chart">${chart(Object.assign({}, PWR, { dots: r.points.map(pt => ({ x: pt.power, y: pt.safety })), avg: { x: a.power, y: a.safety }, pred: { x: p.power, y: p.safety }, avgColor: Z.color, aria: "Each person by power and safety" }))}</div>
+    ${legend([["dot", "One person"], ["avg", "Area average"], ["pred", "Your prediction"]])}
+  </section>
+  <section class="panel">
+    <h2>Statement by statement</h2>
+    <p class="muted small">The bar is your area's average, from 1 (strongly disagree) to 5 (strongly agree). The ring is your prediction.</p>
+    ${Math.abs(biggest.d) >= 0.5 ? `<div class="callout"><b>Your biggest gap:</b> ${esc(biggest.q.short.toLowerCase())}. You predicted ${biggest.pv}; your area says ${fmt(biggest.v)}.</div>` : ""}
+    <div class="bars">${bars}</div>
+  </section>
+  <section class="panel">
+    <h2>Reflect on your own first</h2>
+    <ol class="qs">${reflect.map(q => `<li>${esc(q)}</li>`).join("")}</ol>
+  </section>
+  <section class="panel">
+    <h2>Take it back to your team</h2>
+    <p>Share your area's result, then ask:</p>
+    <ol class="qs">
+      <li>Here's what our area said. Where do you think our team sits within this?</li>
+      <li>What's one thing that would make it easier to speak up in our team?</li>
+      <li>What's one thing I should start, stop or continue?</li>
+    </ol>
+    <p class="small muted" style="margin-top:12px">Nobody needs to say how they answered. No direct reports? Use the same questions with the colleagues you work with most.</p>
+  </section>
+  <section class="panel">
+    <h2>Take it up, together</h2>
+    <p>Every W2 and W3 in your area sees this same result. Agree with them what it says, what each of you is doing about it, and the one thing you need from your executive. Then take it up together.</p>
+  </section>
+  ${foot}`);
+  done();
 }
 
 /* Once a statement is answered, stop marking it as missing. */
@@ -624,44 +866,6 @@ function scaleQ(name, i, text) {
     <legend class="qtext" style="padding:0"><span class="qnum">${i + 1}</span><span>${esc(text)}</span></legend>
     <div class="scale">${[1, 2, 3, 4, 5].map(v => `<label><input type="radio" name="${name}" value="${v}" aria-label="${v}: ${SCALE_WORDS[v - 1]}"><span class="n">${v}</span><span class="w">${SCALE_WORDS[v - 1]}</span></label>`).join("")}</div>
   </fieldset>`;
-}
-
-function viewCreated(code, key, name) {
-  const sLink = surveyLink(code), rLink = resultsLink(code, key);
-  const msg = `Hi team,
-
-I'm taking part in a leadership programme and I'd value your honest view of how our team works. It's 8 quick statements, about two minutes, and it's anonymous: I'll only see the combined results once at least 4 of you have responded, and I'll never see who said what.
-
-I'll share what comes back with you.
-
-${sLink}
-
-Thank you.`;
-  const mail = "mailto:?subject=" + encodeURIComponent("In the Zone: " + name) +
-    "&body=" + encodeURIComponent("My private results link (don't share):\n" + rLink + "\n\nSurvey link for my team:\n" + sLink);
-  render(`
-  <div class="reveal">
-    <h1 class="page">Your team check is ready</h1>
-    <p class="lede">${esc(name)}</p>
-  </div>
-  <div class="panel">
-    <h2>Save your private results link</h2>
-    <p>This is the only way back to your results. It isn't shown again, and anyone with it can see your team's results.</p>
-    <div class="linkbox"><code>${esc(rLink)}</code><button class="btn small secondary" data-copy="${esc(rLink)}">Copy</button></div>
-    <div class="actions"><a class="btn secondary small" href="${esc(mail)}">Email both links to myself</a></div>
-  </div>
-  <div class="panel">
-    <h2>Send this to your team</h2>
-    <p>Share the survey link with everyone in your team. You can edit the message before you send it.</p>
-    <div class="linkbox"><code>${esc(sLink)}</code><button class="btn small secondary" data-copy="${esc(sLink)}">Copy</button></div>
-    <label class="field" for="msg" style="margin-top:16px">Message for your team</label>
-    <textarea id="msg">${esc(msg)}</textarea>
-    <div class="actions"><button class="btn small secondary" id="copymsg">Copy message</button></div>
-  </div>
-  <div class="actions"><button class="btn" id="openres">Open my results</button></div>`);
-  bindCopies();
-  $("#copymsg").addEventListener("click", e => copyText($("#msg").value, e.currentTarget));
-  $("#openres").addEventListener("click", () => go("t=" + encodeURIComponent(code) + "&k=" + encodeURIComponent(key)));
 }
 
 function bindCopies() {
@@ -850,54 +1054,67 @@ async function loadAdmin() {
   let d;
   try { d = await api("admin", { password: adminPw }); } catch (e) { fail("The programme view didn't load. Check your connection and try again."); return true; }
   if (!d.ok) return false;
-  const unlocked = d.teams.filter(t => t.averages);
+  const areas = d.areas || [], live = areas.filter(x => x.averages);
   const counts = { learning: 0, comfort: 0, anxiety: 0, apathy: 0 };
-  unlocked.forEach(t => counts[zoneOf(t.averages.safety, t.averages.accountability)]++);
-  const totalResp = d.teams.reduce((s, t) => s + t.n, 0);
-  const rows = d.teams.slice().sort((m, n) => (n.n - m.n)).map(t => {
+  live.forEach(x => counts[zoneOf(x.averages.safety, x.averages.accountability)]++);
+  const gap = x => x.split ? x.split.leaders.averages.safety - x.split.others.averages.safety : null;
+  const rows = areas.map(x => {
+    const av = x.averages, zk = av && zoneOf(av.safety, av.accountability), g = gap(x);
+    return `<tr><td>${esc(areaName(x.area))}</td><td>${x.n}</td><td>${x.leaders}</td>
+      <td>${av ? fmt(av.safety) : ""}</td><td>${av ? fmt(av.power) : ""}</td><td>${av ? fmt(av.accountability) : ""}</td>
+      <td>${av ? `<span class="dot" style="background:${ZONES[zk].color}"></span> ${ZONES[zk].name.replace(" zone", "")}` : `<span class="muted">Waiting (${x.n}/${d.areaMin})</span>`}</td>
+      <td>${g === null ? "" : (g > 0 ? "+" : "") + fmt(g)}</td></tr>`;
+  }).join("");
+  const items = d.areaCohortItems;
+  const cohortBars = items ? ["safety", "power", "accountability"].map(dim => `<p class="group-h">${DIMS[dim]}</p>` + QUESTIONS.map((q, i) => q.dim !== dim ? "" : `
+      <div class="bar"><div class="lbl"><span>${esc(q.short)}</span><b>${fmt(items[i])}</b></div>
+      <div class="track"><div class="fill" style="width:${(items[i] - 1) / 4 * 100}%"></div></div></div>`).join("")).join("") : `<p class="muted">Fewer than ${d.areaMin} responses so far.</p>`;
+  const teams = d.teams || [];
+  const teamRows = teams.slice().sort((m, n) => n.n - m.n).map(t => {
     const av = t.averages, zk = av && zoneOf(av.safety, av.accountability);
     return `<tr><td>${esc(t.name)}</td><td>${esc(t.level)}</td><td>${t.n}</td>
-      <td>${av ? fmt(av.safety) : ""}</td><td>${av ? fmt(av.power) : ""}</td><td>${av ? fmt(av.accountability) : ""}</td>
       <td>${av ? `<span class="dot" style="background:${ZONES[zk].color}"></span> ${ZONES[zk].name.replace(" zone", "")}` : `<span class="muted">Waiting (${t.n}/${d.min})</span>`}</td>
       <td><button class="btn small secondary" data-copy="${esc(resultsLink(t.code, t.key))}">Copy results link</button></td></tr>`;
   }).join("");
-  const cohortBars = d.cohortItems ? ["safety", "power", "accountability"].map(dim => `<p class="group-h">${DIMS[dim]}</p>` + QUESTIONS.map((q, i) => q.dim !== dim ? "" : `
-      <div class="bar"><div class="lbl"><span>${esc(q.short)}</span><b>${fmt(d.cohortItems[i])}</b></div>
-      <div class="track"><div class="fill" style="width:${(d.cohortItems[i] - 1) / 4 * 100}%"></div></div></div>`).join("")).join("") : `<p class="muted">No team has reached ${d.min} responses yet.</p>`;
 
   render(`
-  <div class="reveal"><h1 class="page">Programme view</h1><p class="lede">All teams across the cohort. Teams appear on the graph once they reach ${d.min} responses.</p></div>
+  <div class="reveal"><h1 class="page">Programme view</h1><p class="lede">All eight areas. An area appears on the graph once ${d.areaMin} people in it have responded.</p></div>
   <div class="stats">
-    <div class="stat"><b>${d.teams.length}</b><span>teams created</span></div>
-    <div class="stat"><b>${unlocked.length}</b><span>teams with results</span></div>
-    <div class="stat"><b>${totalResp}</b><span>responses</span></div>
+    <div class="stat"><b>${d.areaTotal || 0}</b><span>responses</span></div>
+    <div class="stat"><b>${areas.reduce((n, x) => n + x.leaders, 0)}</b><span>W2s and W3s</span></div>
+    <div class="stat"><b>${live.length} of ${areas.length}</b><span>areas with results</span></div>
   </div>
   <section class="panel">
-    <h2>Teams by zone</h2>
+    <h2>Areas by zone</h2>
     <p class="small muted">Learning ${counts.learning}, comfort ${counts.comfort}, anxiety ${counts.anxiety}, apathy ${counts.apathy}.</p>
-    <label class="toggle"><input type="checkbox" id="lbls"> Show team names</label>
+    <label class="toggle"><input type="checkbox" id="lbls" checked> Show area names</label>
     <div class="chart" id="achart"></div>
-    ${legend([["w2", "W2 team"], ["w3", "W3 team"], ["avg", "Cohort average"]])}
+    ${legend([["w2", "One area"], ["avg", "All responses"]])}
   </section>
   <section class="panel">
-    <h2>Cohort, statement by statement</h2>
-    <p class="small muted">Averages across all responses from teams with results (${d.cohortN} responses).</p>
+    <h2>All areas</h2>
+    <div class="tablewrap"><table class="teams">
+      <thead><tr><th>Area</th><th>Responses</th><th>W2 and W3</th><th>Safety</th><th>Influence</th><th>Standards</th><th>Zone</th><th>Safety gap by level</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <p class="small muted" style="margin-top:10px">Safety gap by level is the W2 and W3 average minus everyone else's. It shows once ${SPLIT_MIN} people in each group have responded.</p>
+    <div class="actions"><button class="btn small secondary" id="csv">Download summary (CSV)</button><button class="btn small secondary" id="reload">Refresh</button></div>
+  </section>
+  <section class="panel">
+    <h2>All responses, statement by statement</h2>
+    <p class="small muted">Averages across every response (${d.areaTotal || 0}).</p>
     ${cohortBars}
   </section>
-  <section class="panel">
-    <h2>All teams</h2>
-    <div class="tablewrap"><table class="teams">
-      <thead><tr><th>Team</th><th>Level</th><th>Responses</th><th>Safety</th><th>Influence</th><th>Standards</th><th>Zone</th><th></th></tr></thead>
-      <tbody>${rows || `<tr><td colspan="8" class="muted">No teams yet. Share the start page with leaders to begin.</td></tr>`}</tbody>
-    </table></div>
-    <div class="actions"><button class="btn small secondary" id="csv">Download summary (CSV)</button><button class="btn small secondary" id="reload">Refresh</button></div>
-  </section>`);
+  ${teams.length ? `<section class="panel"><details class="legacy"><summary>Earlier team checks (${teams.length})</summary>
+    <p class="small muted" style="margin-top:10px">Created before the move to area results. Their links still work, and they unlock at ${d.min} responses.</p>
+    <div class="tablewrap"><table class="teams"><thead><tr><th>Team</th><th>Level</th><th>Responses</th><th>Zone</th><th></th></tr></thead><tbody>${teamRows}</tbody></table></div>
+  </details></section>` : ""}`);
   const draw = () => {
     $("#achart").innerHTML = chart(Object.assign({}, EDM, {
-      teams: unlocked.map(t => ({ x: t.averages.accountability, y: t.averages.safety, level: t.level, label: t.name })),
+      teams: live.map(x => ({ x: x.averages.accountability, y: x.averages.safety, level: "W2", label: areaName(x.area) })),
       showLabels: $("#lbls").checked,
-      avg: d.cohort ? { x: d.cohort.accountability, y: d.cohort.safety } : null,
-      avgColor: "var(--learning)", aria: "All teams on the zones graph"
+      avg: d.areaCohort ? { x: d.areaCohort.accountability, y: d.areaCohort.safety } : null,
+      avgColor: "var(--learning)", aria: "All areas on the zones graph"
     }));
   };
   $("#lbls").addEventListener("change", draw);
@@ -905,15 +1122,15 @@ async function loadAdmin() {
   bindCopies();
   $("#reload").addEventListener("click", () => loadAdmin());
   $("#csv").addEventListener("click", () => {
-    const head = ["team", "level", "responses", "safety", "influence", "standards", "zone", "pred_safety", "pred_influence", "pred_standards"];
+    const head = ["area", "responses", "w2_w3", "safety", "influence", "standards", "zone", "w2_w3_safety", "others_safety", "w2_w3_standards", "others_standards"];
     const q = v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
-    const lines = [head.join(",")].concat(d.teams.map(t => {
-      const av = t.averages;
-      return [t.name, t.level, t.n, av && av.safety, av && av.power, av && av.accountability,
-        av ? ZONES[zoneOf(av.safety, av.accountability)].name : "", t.prediction && t.prediction.safety, t.prediction && t.prediction.power, t.prediction && t.prediction.accountability].map(q).join(",");
+    const lines = [head.join(",")].concat(areas.map(x => {
+      const av = x.averages, sp = x.split;
+      return [areaName(x.area), x.n, x.leaders, av && av.safety, av && av.power, av && av.accountability, av ? ZONES[zoneOf(av.safety, av.accountability)].name : "",
+        sp && sp.leaders.averages.safety, sp && sp.others.averages.safety, sp && sp.leaders.averages.accountability, sp && sp.others.averages.accountability].map(q).join(",");
     }));
     const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" }));
-    const aEl = document.createElement("a"); aEl.href = url; aEl.download = "in-the-zone-summary.csv";
+    const aEl = document.createElement("a"); aEl.href = url; aEl.download = "in-the-zone-areas.csv";
     document.body.appendChild(aEl); aEl.click(); aEl.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
@@ -924,7 +1141,7 @@ async function loadAdmin() {
 $("#partner").textContent = CONFIG.PARTNER;
 if (DEMO) {
   $("#demo").innerHTML = `<div class="demo">Demo mode: nothing is saved. Try
-    <button data-go="">Start page</button><button data-go="t=DEMO01">Team survey</button><button data-go="t=DEMO01&k=demo">Results</button><button data-go="t=DEMO03&k=demo3">Locked results</button><button data-go="admin=1">Programme view</button></div>`;
+    <button data-go="again=1">Start page</button><button data-go="r=demoarea">Area results</button><button data-go="r=demonosplit">Results, no level view</button><button data-go="r=demolocked">Locked results</button><button data-go="admin=1">Programme view</button></div>`;
   document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.getAttribute("data-go"))));
 }
 route();

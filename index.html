@@ -261,7 +261,7 @@ const AREAS = [
   { id: "other", name: "Other", sub: "I don't sit in one of these areas" }
 ];
 const POOLED_AREA = "other";  // too small for its own results, so it sees every area combined
-const AREA_MIN = 6;   // matches AREA_MIN_RESPONSES in Code.gs
+const AREA_MIN = 4;   // matches AREA_MIN_RESPONSES in Code.gs
 const SPLIT_MIN = 4;  // matches SPLIT_MIN in Code.gs
 
 /* ====================================================================== */
@@ -392,7 +392,7 @@ const MOCK = {
     DEMO04: { key: "demo4", name: "Card Operations", level: "W2", prediction: predFromItems([5,4,4,4,4,4,4,4]),
       responses: [[4,4,3,4,2,2,3,3],[5,4,4,4,3,2,2,3],[4,5,3,3,2,2,2,2],[4,4,4,4,3,2,3,3],[5,5,4,4,2,3,2,3]] }
   },
-  areaMin: 6, splitMin: 4,
+  areaMin: 4, splitMin: 4,
   areaResponses: [
     ...[[5,4,4,4,4,4,4,4],[4,4,4,5,4,3,4,4],[4,5,4,4,5,4,4,3],[4,4,3,4,4,4,3,4],[5,4,5,4,4,4,4,4],[4,3,4,4,4,3,4,3]].map(a => ({ area: "credit-risk", group: "leader", a })),
     ...[[3,2,2,2,4,3,3,2],[2,2,2,1,4,4,3,2],[4,3,3,3,4,3,3,3],[3,3,2,2,3,3,2,2],[2,1,1,2,4,3,2,1],[4,4,3,3,4,4,4,3],[3,2,2,3,3,3,3,2],[2,2,2,2,4,4,3,2]].map(a => ({ area: "credit-risk", group: "other", a })),
@@ -458,6 +458,12 @@ const mock = {
     MOCK.areaLeaders[key] = { area: p.area, level: p.level, items: p.predItems.slice() };
     return { ok: true, key };
   },
+  areaRelink(p) {
+    if (!AREAS.some(a => a.id === p.area) || !["W2", "W3"].includes(p.level) || !validAnswers(p.predItems)) return { ok: false, error: "invalid" };
+    const key = "k" + Math.random().toString(36).slice(2, 14);
+    MOCK.areaLeaders[key] = { area: p.area, level: p.level, items: p.predItems.slice() };
+    return { ok: true, key };
+  },
   areaResults(p) {
     const L = MOCK.areaLeaders[p.key];
     if (!L) return { ok: false, error: "not_found" };
@@ -472,7 +478,7 @@ const mock = {
       return { code, key: t.key, name: t.name, level: t.level, n: t.responses.length, prediction: t.prediction, averages: unlocked ? summarise(t.responses).averages : null };
     });
     const s = all.length ? summarise(all) : null;
-    const areas = AREAS.map(a => { const m = mockAreaSummary(a.id); return { area: a.id, n: m.n, leaders: Object.values(MOCK.areaLeaders).filter(l => l.area === a.id).length, averages: m.locked ? null : m.averages, split: m.split }; });
+    const areas = AREAS.map(a => { const m = mockAreaSummary(a.id); return { area: a.id, n: m.n, leaders: MOCK.areaResponses.filter(r => r.area === a.id && r.group === "leader").length, averages: m.locked ? null : m.averages, split: m.split }; });
     const pooled = MOCK.areaResponses.map(r => r.a), ps = pooled.length >= MOCK.areaMin ? summarise(pooled) : null;
     return { ok: true, min: MOCK.min, areaMin: MOCK.areaMin, areas, areaTotal: pooled.length, areaCohort: ps && ps.averages, areaCohortItems: ps && ps.itemAverages,
       teams, cohort: s && s.averages, cohortItems: s && s.itemAverages, cohortN: all.length };
@@ -508,6 +514,7 @@ function route() {
   if (t && k) return viewResults(t, k);
   if (t) return viewSurvey(t);
   if (params.get("r")) return viewAreaResults(params.get("r"));
+  if (params.has("lost")) return viewAreaLost();
   return viewAreaStart();
 }
 const app = () => $("#app");
@@ -623,7 +630,9 @@ function viewAreaStart() {
     render(`<div class="reveal"><div class="wordmark">In the Zone</div></div>
       <div class="panel"><h2>You've already responded</h2><p>Your answers were submitted from this device. Thank you.</p>
       ${savedKey ? `<div class="actions"><button class="btn" id="openmine">Open my area's results</button></div>` : ""}
-      <p class="small muted" style="margin-top:16px">Sharing this device with a colleague? <a href="#" id="again">Respond as a different person</a>.</p></div>`);
+      <p class="small muted" style="margin-top:16px">Sharing this device with a colleague? <a href="#" id="again">Respond as a different person</a>.</p>
+      <p class="small muted">W2 or W3 and lost your results link? <a href="#" id="lost">Get a new one</a>.</p></div>`);
+    $("#lost").addEventListener("click", ev => { ev.preventDefault(); go("lost=1"); });
     if (savedKey) $("#openmine").addEventListener("click", () => go("r=" + encodeURIComponent(savedKey)));
     $("#again").addEventListener("click", ev => { ev.preventDefault(); go("again=1"); });
     return;
@@ -663,7 +672,9 @@ function viewAreaStart() {
     </div>
     <p class="error" id="aferr" hidden></p>
     <div class="actions"><button class="btn" type="submit" id="afbtn">Submit my answers</button></div>
-  </form>`);
+  </form>
+  <p class="small muted" style="margin-top:18px">Already responded as a W2 or W3 and lost your results link? <a href="#" id="lost">Get a new one</a>.</p>`);
+  $("#lost").addEventListener("click", ev => { ev.preventDefault(); go("lost=1"); });
   const form = $("#af");
   const level = () => { const c = form.querySelector("input[name=level]:checked"); return c ? c.value : null; };
   form.addEventListener("change", ev => {
@@ -707,7 +718,62 @@ function viewAreaStart() {
   });
 }
 
-function viewAreaSaved(key, area) {
+/* A W2 or W3 who has already answered re-enters their prediction to get a new results link. */
+function viewAreaLost() {
+  document.title = "In the Zone: new results link";
+  render(`
+  <div class="reveal"><h1 class="page">Get a new results link</h1>
+  <p class="lede">For W2s and W3s who have already responded. Your answers are stored without your name, so your old link can't be looked up. Re-enter your prediction and you'll get a new one. Your earlier answers stay as they are and aren't counted twice.</p></div>
+  <form id="lf" class="panel" novalidate>
+    <span class="field" id="larea-l">Which area do you work in?</span>
+    <div class="picks" role="radiogroup" aria-labelledby="larea-l">
+      ${AREAS.map(a => `<label class="pick"><input type="radio" name="area" value="${a.id}"><span><b>${esc(a.name)}</b><small>${esc(a.sub)}</small></span></label>`).join("")}
+    </div>
+    <div style="margin-top:22px">
+      <span class="field" id="llvl-l">Your level</span>
+      <div class="seg" role="radiogroup" aria-labelledby="llvl-l">
+        <label><input type="radio" name="level" value="W2"><span>W2</span></label>
+        <label><input type="radio" name="level" value="W3"><span>W3</span></label>
+      </div>
+    </div>
+    <div style="margin-top:34px">
+      <h3>Your prediction</h3>
+      <p class="hint" style="margin-bottom:22px">How do you think people across your area rated these statements, on average, each thinking about their own team?</p>
+      ${QUESTIONS.map((q, i) => scaleQ("p" + i, i, q.lead.replace("in this team", "in their team"))).join("")}
+    </div>
+    <p class="error" id="lferr" hidden></p>
+    <div class="actions"><button class="btn" type="submit" id="lfbtn">Get my new results link</button><button class="btn secondary" type="button" id="lfback">Back</button></div>
+  </form>`);
+  const form = $("#lf");
+  $("#lfback").addEventListener("click", () => go(""));
+  form.addEventListener("change", ev => clearMissing(ev.target));
+  form.addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const area = form.querySelector("input[name=area]:checked"), lv = form.querySelector("input[name=level]:checked"), pred = pickedIn(form, "p");
+    const err = $("#lferr"), msgs = [], fields = [];
+    if (!area) fields.push("your area");
+    if (!lv) fields.push("your level");
+    if (fields.length) msgs.push("Choose " + fields.join(" and ") + ".");
+    QUESTIONS.forEach((q, i) => $("#p" + i + "-q").classList.toggle("missing", pred[i] === null));
+    const gaps = pred.filter(v => v === null).length;
+    if (gaps) msgs.push(gaps === 8 ? "Answer the 8 prediction statements." : "Answer the " + gaps + " remaining prediction statement" + (gaps > 1 ? "s" : "") + ".");
+    if (msgs.length) { err.hidden = false; err.textContent = msgs.join(" "); return; }
+    err.hidden = true;
+    const btn = $("#lfbtn"); btn.disabled = true; btn.textContent = "Creating";
+    try {
+      const res = await api("areaRelink", { area: area.value, level: lv.value, predItems: pred });
+      if (!res.ok) throw new Error(res.error);
+      store.set("itz_area_done", "1"); store.set("itz_area_key", res.key);
+      viewAreaSaved(res.key, area.value, "Your new link is ready"); window.scrollTo(0, 0);
+    } catch (e) {
+      err.hidden = false;
+      err.textContent = "Your new link wasn't created. Check your connection and try again." + (e && e.message && e.message !== "network" ? " (" + e.message + ")" : "");
+      btn.disabled = false; btn.textContent = "Get my new results link";
+    }
+  });
+}
+
+function viewAreaSaved(key, area, title) {
   const link = areaResultsLink(key), share = baseUrl();
   const mail = "mailto:?subject=" + encodeURIComponent("In the Zone: my results link") + "&body=" + encodeURIComponent("My private results link (don't share):\n" + link);
   const msg = `Hi team,
@@ -720,7 +786,7 @@ ${share}
 
 Thank you.`;
   render(`
-  <div class="reveal"><h1 class="page">Your answers are in</h1><p class="lede">${esc(areaName(area))}</p></div>
+  <div class="reveal"><h1 class="page">${esc(title || "Your answers are in")}</h1><p class="lede">${esc(areaName(area))}</p></div>
   <div class="panel">
     <h2>Save your private results link</h2>
     <p>This is your way back to your area's results and your prediction. It's saved on this device, but keep a copy in case you switch devices.</p>
@@ -746,7 +812,7 @@ async function viewAreaResults(key) {
   render(`<div class="spinner">Loading your area's results</div>`);
   let r;
   try { r = await api("areaResults", { key }); } catch (e) { return fail("Your results didn't load. Check your connection and try again."); }
-  if (!r.ok) return render(`<div class="panel reveal"><h1 class="page">This results link isn't working</h1><p>Check you've copied the whole link. If you've lost it, you can respond again from the start page to get a new one.</p></div>`);
+  if (!r.ok) return render(`<div class="panel reveal"><h1 class="page">This results link isn't working</h1><p>Check you've copied the whole link. If you've lost it, you can <a href="#" id="lost">get a new one</a>.</p></div>`), $("#lost").addEventListener("click", ev => { ev.preventDefault(); go("lost=1"); });
   const name = r.pooled ? "All areas combined" : areaName(r.area);
   const pooledNote = r.pooled ? `<div class="note"><p style="margin:0">You chose Other, so there's no single area to show you. These are the results for every area combined, and "your area" here means the whole business.</p></div>` : "";
   document.title = "Results: " + name;

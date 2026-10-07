@@ -257,8 +257,10 @@ const AREAS = [
   { id: "finance", name: "Finance", sub: "Chief Financial Officer's area" },
   { id: "customer-operations", name: "Customer Operations", sub: "Customer Operations Executive's area" },
   { id: "customer", name: "Customer", sub: "Chief Customer Officer's area" },
-  { id: "people-culture", name: "People & Culture", sub: "Chief P&C Officer's area" }
+  { id: "people-culture", name: "People & Culture", sub: "Chief P&C Officer's area" },
+  { id: "other", name: "Other", sub: "I don't sit in one of these areas" }
 ];
+const POOLED_AREA = "other";  // too small for its own results, so it sees every area combined
 const AREA_MIN = 6;   // matches AREA_MIN_RESPONSES in Code.gs
 const SPLIT_MIN = 4;  // matches SPLIT_MIN in Code.gs
 
@@ -401,15 +403,16 @@ const MOCK = {
   areaLeaders: {
     demoarea: { area: "credit-risk", level: "W2", items: [4,4,4,4,4,4,4,5] },
     demolocked: { area: "finance", level: "W3", items: [4,4,3,4,4,3,4,4] },
-    demonosplit: { area: "customer", level: "W2", items: [4,4,4,4,4,3,4,4] }
+    demonosplit: { area: "customer", level: "W2", items: [4,4,4,4,4,3,4,4] },
+    demoother: { area: "other", level: "W3", items: [4,4,3,3,4,4,3,4] }
   }
 };
 
-function mockAreaSummary(area) {
-  const mine = MOCK.areaResponses.filter(r => r.area === area);
+function mockAreaSummary(area, pooled) {
+  const mine = MOCK.areaResponses.filter(r => pooled || r.area === area);
   const leaders = mine.filter(r => r.group === "leader").map(r => r.a), others = mine.filter(r => r.group !== "leader").map(r => r.a);
   const all = leaders.concat(others);
-  const out = { area, n: all.length, min: MOCK.areaMin, locked: all.length < MOCK.areaMin, split: null };
+  const out = { area, pooled: !!pooled, n: all.length, min: MOCK.areaMin, locked: all.length < MOCK.areaMin, split: null };
   if (out.locked) return out;
   Object.assign(out, summarise(all));
   if (leaders.length >= MOCK.splitMin && others.length >= MOCK.splitMin) {
@@ -458,7 +461,7 @@ const mock = {
   areaResults(p) {
     const L = MOCK.areaLeaders[p.key];
     if (!L) return { ok: false, error: "not_found" };
-    return Object.assign(mockAreaSummary(L.area), { ok: true, level: L.level, prediction: predFromItems(L.items) });
+    return Object.assign(mockAreaSummary(L.area, L.area === POOLED_AREA), { ok: true, level: L.level, prediction: predFromItems(L.items) });
   },
   admin(p) {
     if (p.password !== MOCK.password) return { ok: false, error: "denied" };
@@ -632,7 +635,7 @@ function viewAreaStart() {
   </div>
   <div class="note">
     <p style="margin:0 0 8px"><b>Your answers are anonymous.</b> Results are only ever shown for a whole area, and only once at least ${AREA_MIN} people in it have responded. Nobody sees results for a single team, and nobody sees who said what.</p>
-    <p style="margin:0">We store only your area, whether you are a W2 or W3, your 8 answers and the date. No names, emails or device details.</p>
+    <p style="margin:0">We store only your area, whether you are a W2 or W3 and your 8 answers. No names, emails or device details.</p>
   </div>
   <form id="af" class="panel" novalidate>
     <h2>About you</h2>
@@ -711,7 +714,7 @@ function viewAreaSaved(key, area) {
 
 As part of a leadership programme, I'd value your honest view of how our team works. It's 8 quick statements, about two minutes, and it's anonymous: results are only ever shown for our whole area, never for one team, so nobody can see how you answered, including me.
 
-Choose ${areaName(area)} as your area.
+${area === POOLED_AREA ? "Choose the area you work in, or Other if none fits." : "Choose " + areaName(area) + " as your area."}
 
 ${share}
 
@@ -744,10 +747,11 @@ async function viewAreaResults(key) {
   let r;
   try { r = await api("areaResults", { key }); } catch (e) { return fail("Your results didn't load. Check your connection and try again."); }
   if (!r.ok) return render(`<div class="panel reveal"><h1 class="page">This results link isn't working</h1><p>Check you've copied the whole link. If you've lost it, you can respond again from the start page to get a new one.</p></div>`);
-  const name = areaName(r.area);
+  const name = r.pooled ? "All areas combined" : areaName(r.area);
+  const pooledNote = r.pooled ? `<div class="note"><p style="margin:0">You chose Other, so there's no single area to show you. These are the results for every area combined, and "your area" here means the whole business.</p></div>` : "";
   document.title = "Results: " + name;
   const p = r.prediction;
-  const head = `<div class="reveal"><p class="muted" style="margin:0 0 4px">Area results, ${r.n} ${r.n === 1 ? "response" : "responses"}</p><h1 class="page">${esc(name)}</h1></div>`;
+  const head = `<div class="reveal"><p class="muted" style="margin:0 0 4px">Area results, ${r.n} ${r.n === 1 ? "response" : "responses"}</p><h1 class="page">${esc(name)}</h1></div>${pooledNote}`;
   const foot = `<div class="panel"><h3>Keep collecting</h3><p class="small muted">Results update as more people in your area respond. Everyone uses the same link.</p>
     <div class="linkbox"><code>${esc(baseUrl())}</code><button class="btn small secondary" data-copy="${esc(baseUrl())}">Copy</button></div>
     <div class="actions"><button class="btn small secondary" id="refresh">Refresh results</button></div></div>`;
@@ -1078,7 +1082,7 @@ async function loadAdmin() {
   }).join("");
 
   render(`
-  <div class="reveal"><h1 class="page">Programme view</h1><p class="lede">All eight areas. An area appears on the graph once ${d.areaMin} people in it have responded.</p></div>
+  <div class="reveal"><h1 class="page">Programme view</h1><p class="lede">Every area. An area appears on the graph once ${d.areaMin} people in it have responded.</p></div>
   <div class="stats">
     <div class="stat"><b>${d.areaTotal || 0}</b><span>responses</span></div>
     <div class="stat"><b>${areas.reduce((n, x) => n + x.leaders, 0)}</b><span>W2s and W3s</span></div>

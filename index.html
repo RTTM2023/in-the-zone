@@ -243,7 +243,12 @@ footer { padding: 20px 0 40px; font-size: 12px; color: var(--page-soft); border-
    CONFIG: the only part you need to edit
    ====================================================================== */
 const CONFIG = {
-  // Paste the Google Apps Script web app URL here. Leave empty for demo mode.
+  // Where responses are stored: your Supabase Project URL and publishable key.
+  // The publishable key is made to be public. Never put a secret key here.
+  SUPABASE_URL: "https://esplypfpyjkazoatqwjz.supabase.co",
+  SUPABASE_KEY: "sb_publishable_iwF7woZ3aw-CECtPtyWm3g_hjdkAjHL",
+  // The earlier Google Apps Script URL. Only used for team checks created
+  // before the move to areas, so their links keep working.
   API_URL: "https://script.google.com/macros/s/AKfycbw4pOU3f2TL5Tp7ez5V8J_kxW-kh_xBagYMmS89L4G42rG2gJW86_NujGLOn_gnGf9C/exec",
   // Optional: the public address of this page, e.g. "https://runtothemonster.github.io/in-the-zone/"
   // Leave empty to use the address the page is opened from.
@@ -382,7 +387,12 @@ function predFromItems(items) {
 const validAnswers = a => Array.isArray(a) && a.length === 8 && a.every(v => Number.isInteger(v) && v >= 1 && v <= 5);
 
 /* ---------- API (real or demo) ---------- */
-const DEMO = !CONFIG.API_URL;
+const SUPA = !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_KEY);
+const DEMO = !CONFIG.API_URL && !SUPA;
+/* Everything to do with areas goes to Supabase once it is set up. */
+const SUPA_ACTIONS = ["areaSubmit", "areaResults", "areaRelink", "admin"];
+/* Shown while saving or loading on the slower Google storage only. */
+const WAIT_NOTE = SUPA ? "" : " This can take up to 30 seconds, so please keep this page open.";
 const MOCK = {
   min: 4,
   password: "demo",
@@ -501,12 +511,32 @@ async function api(action, payload) {
     await new Promise(r => setTimeout(r, 250));
     return mock[action](payload || {});
   }
+  if (SUPA && SUPA_ACTIONS.includes(action)) return supaCall(action, payload);
+  if (!CONFIG.API_URL) throw new Error("network");
+  return googleCall(action, payload);
+}
+async function googleCall(action, payload) {
   const res = await fetch(CONFIG.API_URL, {
     method: "POST",
     body: JSON.stringify(Object.assign({ action }, payload || {}))
   });
   if (!res.ok) throw new Error("network");
   return res.json();
+}
+async function supaCall(action, payload) {
+  const key = CONFIG.SUPABASE_KEY.trim();
+  const headers = { "Content-Type": "application/json", "apikey": key };
+  // Older "anon" keys are also sent as a bearer token. Publishable keys must not be.
+  if (key.startsWith("eyJ")) headers["Authorization"] = "Bearer " + key;
+  const stop = new AbortController(), timer = setTimeout(() => stop.abort(), 15000);
+  try {
+    const res = await fetch(CONFIG.SUPABASE_URL.trim().replace(/\/+$/, "") + "/rest/v1/rpc/in_the_zone", {
+      method: "POST", headers, signal: stop.signal,
+      body: JSON.stringify({ req: Object.assign({ action }, payload || {}) })
+    });
+    if (!res.ok) throw new Error("network");
+    return await res.json();
+  } finally { clearTimeout(timer); }
 }
 
 /* A random one-off id per form. The server uses it to recognise a repeat of the
@@ -743,7 +773,7 @@ function viewAreaStart() {
     }
     err.hidden = true;
     const btn = $("#afbtn"); btn.disabled = true; btn.textContent = "Saving your answers";
-    err.hidden = false; err.className = "wait"; err.textContent = "Saving your answers. This can take up to 30 seconds, so please keep this page open.";
+    err.hidden = false; err.className = "wait"; err.textContent = "Saving your answers." + WAIT_NOTE;
     let res;
     try {
       res = await apiSave("areaSubmit", { area: area.value, level: lv, answers, predItems: pred, sid });
@@ -803,7 +833,7 @@ function viewAreaLost() {
     if (msgs.length) { err.hidden = false; err.className = "error"; err.textContent = msgs.join(" "); return; }
     err.hidden = true;
     const btn = $("#lfbtn"); btn.disabled = true; btn.textContent = "Creating your link";
-    err.hidden = false; err.className = "wait"; err.textContent = "Creating your link. This can take up to 30 seconds, so please keep this page open.";
+    err.hidden = false; err.className = "wait"; err.textContent = "Creating your link." + WAIT_NOTE;
     let res;
     try {
       res = await apiSave("areaRelink", { area: area.value, level: lv.value, predItems: pred, sid });
@@ -858,7 +888,7 @@ async function viewAreaResults(key) {
   let cached = null;
   try { cached = JSON.parse(store.get("itz_res_" + key) || "null"); } catch (e) { cached = null; }
   if (cached && cached.ok) renderAreaResults(key, cached, "Showing the results saved on this device. Checking for new responses.", true);
-  else render(`<div class="spinner"><p class="wait" style="color:inherit">Loading your area's results. This can take up to 30 seconds.</p></div>`);
+  else render(`<div class="spinner"><p class="wait" style="color:inherit">Loading your area's results.${SUPA ? "" : " This can take up to 30 seconds."}</p></div>`);
   let r;
   try { r = await apiRead("areaResults", { key }); }
   catch (e) {
@@ -1196,13 +1226,19 @@ async function loadAdmin() {
   const cohortBars = items ? ["safety", "power", "accountability"].map(dim => `<p class="group-h">${DIMS[dim]}</p>` + QUESTIONS.map((q, i) => q.dim !== dim ? "" : `
       <div class="bar"><div class="lbl"><span>${esc(q.short)}</span><b>${fmt(items[i])}</b></div>
       <div class="track"><div class="fill" style="width:${(items[i] - 1) / 4 * 100}%"></div></div></div>`).join("")).join("") : `<p class="muted">Fewer than ${d.areaMin} responses so far.</p>`;
-  const teams = d.teams || [];
-  const teamRows = teams.slice().sort((m, n) => n.n - m.n).map(t => {
-    const av = t.averages, zk = av && zoneOf(av.safety, av.accountability);
-    return `<tr><td>${esc(t.name)}</td><td>${esc(t.level)}</td><td>${t.n}</td>
-      <td>${av ? `<span class="dot" style="background:${ZONES[zk].color}"></span> ${ZONES[zk].name.replace(" zone", "")}` : `<span class="muted">Waiting (${t.n}/${d.min})</span>`}</td>
-      <td><button class="btn small secondary" data-copy="${esc(resultsLink(t.code, t.key))}">Copy results link</button></td></tr>`;
-  }).join("");
+  const legacyHtml = (teams, min) => {
+    if (!teams || !teams.length) return "";
+    const teamRows = teams.slice().sort((m, n) => n.n - m.n).map(t => {
+      const av = t.averages, zk = av && zoneOf(av.safety, av.accountability);
+      return `<tr><td>${esc(t.name)}</td><td>${esc(t.level)}</td><td>${t.n}</td>
+        <td>${av ? `<span class="dot" style="background:${ZONES[zk].color}"></span> ${ZONES[zk].name.replace(" zone", "")}` : `<span class="muted">Waiting (${t.n}/${min})</span>`}</td>
+        <td><button class="btn small secondary" data-copy="${esc(resultsLink(t.code, t.key))}">Copy results link</button></td></tr>`;
+    }).join("");
+    return `<section class="panel"><details class="legacy"><summary>Earlier team checks (${teams.length})</summary>
+      <p class="small muted" style="margin-top:10px">Created before the move to area results. Their links still work, and they unlock at ${min} responses.</p>
+      <div class="tablewrap"><table class="teams"><thead><tr><th>Team</th><th>Level</th><th>Responses</th><th>Zone</th><th></th></tr></thead><tbody>${teamRows}</tbody></table></div>
+    </details></section>`;
+  };
 
   render(`
   <div class="reveal"><h1 class="page">Programme view</h1><p class="lede">Every area. An area appears on the graph once ${d.areaMin} people in it have responded.</p></div>
@@ -1232,10 +1268,18 @@ async function loadAdmin() {
     <p class="small muted">Averages across every response (${d.areaTotal || 0}).</p>
     ${cohortBars}
   </section>
-  ${teams.length ? `<section class="panel"><details class="legacy"><summary>Earlier team checks (${teams.length})</summary>
-    <p class="small muted" style="margin-top:10px">Created before the move to area results. Their links still work, and they unlock at ${d.min} responses.</p>
-    <div class="tablewrap"><table class="teams"><thead><tr><th>Team</th><th>Level</th><th>Responses</th><th>Zone</th><th></th></tr></thead><tbody>${teamRows}</tbody></table></div>
-  </details></section>` : ""}`);
+  <div id="legacy">${legacyHtml(d.teams, d.min)}</div>`);
+  // Earlier team checks still live in the Google Sheet. They are fetched quietly,
+  // and only show if the same password is set there.
+  if (SUPA && CONFIG.API_URL && !(d.teams || []).length) {
+    const pw = adminPw;
+    googleCall("admin", { password: pw }).then(g => {
+      const box = $("#legacy");
+      if (box && g && g.ok && pw === adminPw) { box.innerHTML = legacyHtml(g.teams, g.min);
+        box.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", e => copyText(b.getAttribute("data-copy"), e.currentTarget)));
+      }
+    }).catch(() => { /* the programme view works without it */ });
+  }
   const draw = () => {
     $("#achart").innerHTML = chart(Object.assign({}, EDM, {
       teams: live.map(x => ({ x: x.averages.accountability, y: x.averages.safety, level: "W2", label: areaName(x.area) })),

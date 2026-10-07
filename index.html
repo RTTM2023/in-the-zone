@@ -392,7 +392,7 @@ const MOCK = {
     DEMO04: { key: "demo4", name: "Card Operations", level: "W2", prediction: predFromItems([5,4,4,4,4,4,4,4]),
       responses: [[4,4,3,4,2,2,3,3],[5,4,4,4,3,2,2,3],[4,5,3,3,2,2,2,2],[4,4,4,4,3,2,3,3],[5,5,4,4,2,3,2,3]] }
   },
-  areaMin: 4, splitMin: 4,
+  areaMin: 4, splitMin: 4, seen: {},
   areaResponses: [
     ...[[5,4,4,4,4,4,4,4],[4,4,4,5,4,3,4,4],[4,5,4,4,5,4,4,3],[4,4,3,4,4,4,3,4],[5,4,5,4,4,4,4,4],[4,3,4,4,4,3,4,3]].map(a => ({ area: "credit-risk", group: "leader", a })),
     ...[[3,2,2,2,4,3,3,2],[2,2,2,1,4,4,3,2],[4,3,3,3,4,3,3,3],[3,3,2,2,3,3,2,2],[2,1,1,2,4,3,2,1],[4,4,3,3,4,4,4,3],[3,2,2,3,3,3,3,2],[2,2,2,2,4,4,3,2]].map(a => ({ area: "credit-risk", group: "other", a })),
@@ -450,18 +450,25 @@ const mock = {
     return out;
   },
   areaSubmit(p) {
+    if (p.sid && MOCK.seen[p.sid]) return MOCK.seen[p.sid];
     const lead = p.level === "W2" || p.level === "W3";
     if (!AREAS.some(a => a.id === p.area) || !["W2", "W3", "Other"].includes(p.level) || !validAnswers(p.answers) || (lead && !validAnswers(p.predItems))) return { ok: false, error: "invalid" };
     MOCK.areaResponses.push({ area: p.area, group: lead ? "leader" : "other", a: p.answers.slice() });
-    if (!lead) return { ok: true };
-    const key = "k" + Math.random().toString(36).slice(2, 14);
-    MOCK.areaLeaders[key] = { area: p.area, level: p.level, items: p.predItems.slice() };
-    return { ok: true, key };
+    let out = { ok: true };
+    if (lead) {
+      const key = "k" + Math.random().toString(36).slice(2, 14);
+      MOCK.areaLeaders[key] = { area: p.area, level: p.level, items: p.predItems.slice() };
+      out = { ok: true, key };
+    }
+    if (p.sid) MOCK.seen[p.sid] = out;
+    return out;
   },
   areaRelink(p) {
+    if (p.sid && MOCK.seen[p.sid]) return MOCK.seen[p.sid];
     if (!AREAS.some(a => a.id === p.area) || !["W2", "W3"].includes(p.level) || !validAnswers(p.predItems)) return { ok: false, error: "invalid" };
     const key = "k" + Math.random().toString(36).slice(2, 14);
     MOCK.areaLeaders[key] = { area: p.area, level: p.level, items: p.predItems.slice() };
+    if (p.sid) MOCK.seen[p.sid] = { ok: true, key };
     return { ok: true, key };
   },
   areaResults(p) {
@@ -496,6 +503,27 @@ async function api(action, payload) {
   });
   if (!res.ok) throw new Error("network");
   return res.json();
+}
+
+/* A random one-off id per form. The server uses it to recognise a repeat of the
+   same submission, so a retry or a second click is never saved twice. */
+function newSubmissionId() {
+  try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) { /* fall through */ }
+  return "s" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 12) + Math.random().toString(36).slice(2, 12);
+}
+/* Saves with up to two quiet retries. Safe to repeat because of the submission id. */
+async function apiSave(action, payload) {
+  let last;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt) await new Promise(r => setTimeout(r, attempt * 1500));
+    try {
+      const res = await api(action, payload);
+      if (res && res.ok) return res;
+      last = new Error((res && res.error) || "failed");
+      if (res && res.error === "invalid") break;
+    } catch (e) { last = e; }
+  }
+  throw last;
 }
 
 /* ---------- routing ---------- */
@@ -676,6 +704,7 @@ function viewAreaStart() {
   <p class="small muted" style="margin-top:18px">Already responded as a W2 or W3 and lost your results link? <a href="#" id="lost">Get a new one</a>.</p>`);
   $("#lost").addEventListener("click", ev => { ev.preventDefault(); go("lost=1"); });
   const form = $("#af");
+  const sid = newSubmissionId();
   const level = () => { const c = form.querySelector("input[name=level]:checked"); return c ? c.value : null; };
   form.addEventListener("change", ev => {
     if (ev.target.name === "level") $("#predwrap").hidden = level() === "Other" || !level();
@@ -703,18 +732,19 @@ function viewAreaStart() {
     }
     err.hidden = true;
     const btn = $("#afbtn"); btn.disabled = true; btn.textContent = "Submitting";
+    let res;
     try {
-      const res = await api("areaSubmit", { area: area.value, level: lv, answers, predItems: pred });
-      if (!res.ok) throw new Error(res.error);
-      store.set("itz_area_done", "1");
-      if (res.key) { store.set("itz_area_key", res.key); viewAreaSaved(res.key, area.value); }
-      else render(`<div class="panel reveal center"><h1 class="page">Thank you</h1><p>Your answers for ${esc(areaName(area.value))} are in.</p><p class="muted">Results are only shown for the area as a whole.</p></div>`);
-      window.scrollTo(0, 0);
+      res = await apiSave("areaSubmit", { area: area.value, level: lv, answers, predItems: pred, sid });
     } catch (e) {
       err.hidden = false;
-      err.textContent = "Your answers weren't submitted. Check your connection and try again." + (e && e.message && e.message !== "network" ? " (" + e.message + ")" : "");
+      err.textContent = "Your answers weren't submitted. Check your connection and try again. It's safe to click again: your answers are only ever saved once." + (e && e.message && !/network|fetch/i.test(e.message) ? " (" + e.message + ")" : "");
       btn.disabled = false; btn.textContent = "Submit my answers";
+      return;
     }
+    store.set("itz_area_done", "1");
+    if (res.key) { store.set("itz_area_key", res.key); viewAreaSaved(res.key, area.value); }
+    else render(`<div class="panel reveal center"><h1 class="page">Thank you</h1><p>Your answers for ${esc(areaName(area.value))} are in.</p><p class="muted">Results are only shown for the area as a whole.</p></div>`);
+    window.scrollTo(0, 0);
   });
 }
 
@@ -745,6 +775,7 @@ function viewAreaLost() {
     <div class="actions"><button class="btn" type="submit" id="lfbtn">Get my new results link</button><button class="btn secondary" type="button" id="lfback">Back</button></div>
   </form>`);
   const form = $("#lf");
+  const sid = newSubmissionId();
   $("#lfback").addEventListener("click", () => go(""));
   form.addEventListener("change", ev => clearMissing(ev.target));
   form.addEventListener("submit", async ev => {
@@ -760,16 +791,17 @@ function viewAreaLost() {
     if (msgs.length) { err.hidden = false; err.textContent = msgs.join(" "); return; }
     err.hidden = true;
     const btn = $("#lfbtn"); btn.disabled = true; btn.textContent = "Creating";
+    let res;
     try {
-      const res = await api("areaRelink", { area: area.value, level: lv.value, predItems: pred });
-      if (!res.ok) throw new Error(res.error);
-      store.set("itz_area_done", "1"); store.set("itz_area_key", res.key);
-      viewAreaSaved(res.key, area.value, "Your new link is ready"); window.scrollTo(0, 0);
+      res = await apiSave("areaRelink", { area: area.value, level: lv.value, predItems: pred, sid });
     } catch (e) {
       err.hidden = false;
-      err.textContent = "Your new link wasn't created. Check your connection and try again." + (e && e.message && e.message !== "network" ? " (" + e.message + ")" : "");
+      err.textContent = "Your new link wasn't created. Check your connection and try again." + (e && e.message && !/network|fetch/i.test(e.message) ? " (" + e.message + ")" : "");
       btn.disabled = false; btn.textContent = "Get my new results link";
+      return;
     }
+    store.set("itz_area_done", "1"); store.set("itz_area_key", res.key);
+    viewAreaSaved(res.key, area.value, "Your new link is ready"); window.scrollTo(0, 0);
   });
 }
 
